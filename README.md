@@ -6,4 +6,7 @@ LouPlus Team 6 https://www.shiyanlou.com/louplus/python
 * [Alexmooc](https://github.com/clikks)
 
 * [简单的几何学](https://github.com/lvix)
+<<<<<<< HEAD
 
+=======
+>>>>>>> fix #4 add info to README
