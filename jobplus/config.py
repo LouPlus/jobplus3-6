@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 
+
 class BaseConfig(object):
     SECRET_KEY = 'makesure to set a very secret key'
 
@@ -26,5 +27,3 @@ configs = {
     'production': ProductionConfig,
     'testing': TestingConfig
 }
-
-
