@@ -3,16 +3,16 @@
 
 
 from flask import Flask
-from flask-migrate import Migrate
+from flask_migrate import Migrate
 
 from jobplus.config import configs
 from jobplus.models import db
 
 
 def register_blueprints(app):
-    from .handlers import front
-    app.register_blueprint(front)
-
+    # from .handlers import front
+    # app.register_blueprint(front)
+    pass
 
 def create_app(config):
     """
