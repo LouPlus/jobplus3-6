@@ -129,9 +129,8 @@ class Resume(Base):
     expect_job = db.Column(db.String(64))
     attachment = db.Column(db.String(256))
 
-    # relationship
     def __repr__(self):
-        return '<Seeker(id={})>'.format(self.id)
+        return '<Resume(id={})>'.format(self.id)
 
 
 class Company(Base):
@@ -163,6 +162,8 @@ class Company(Base):
     manager_job = db.Column(db.String(32))
     manager_photo = db.Column(db.String(256))
 
+    def __repr__(self):
+        return '<Company(id={})>'.format(self.id)
 
 STATUS_SENT = 1
 STATUS_CHECKED = 2
@@ -199,3 +200,6 @@ class Job(Base):
 
     # relationship
     resumes = db.relationship('Resume', secondary=Mailing, backref=db.backref('jobs'))
+
+    def __repr__(self):
+        return '<Job(id={})>'.format(self.id)
