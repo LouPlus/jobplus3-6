@@ -32,7 +32,7 @@ class User(Base):
     role = db.Column(db.SmallInteger, default=ROLE_SEEKER)
     status = db.Column(db.SmallInteger, default=STATUS_NORMAL)
 
-    # 需要修改
+    # relationship
     seeker_info = db.relationship('Seeker', uselist=False, backref='user')
     company_info = db.relationship('Company', uselist=False, backref='user')
     jobs = db.relationship('Job', uselist=True, backref='user')
@@ -165,16 +165,24 @@ class Company(Base):
     def __repr__(self):
         return '<Company(id={})>'.format(self.id)
 
+
 STATUS_SENT = 1
 STATUS_CHECKED = 2
 STATUS_ACCEPTED = 3
 STATUS_REJECTED = 4
 
-Mailing = db.Table('mailing',
-                   db.Column('resume_id', db.Integer, db.ForeignKey('resume.id'), primary_key=True),
-                   db.Column('job_id', db.Integer, db.ForeignKey('job.id'), primary_key=True),
-                   db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
-                   )
+Delivery = db.Table('delivery',
+                    db.Column('resume_id', db.Integer, db.ForeignKey('resume.id'), primary_key=True),
+                    db.Column('job_id', db.Integer, db.ForeignKey('job.id'), primary_key=True),
+                    db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
+                    )
+
+# 用户可以关注某个职位
+Following = db.Table('following',
+                     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+                     db.Column('job_id', db.Integer, db.ForeignKey('job.id'), primary_key=True),
+                     db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
+                     )
 
 
 class Job(Base):
@@ -185,10 +193,15 @@ class Job(Base):
     EDU_BACHELOR = 20
     EDU_MASTER = 30
     EDU_PHD = 40
-    EDU_NO_LIMIT = 60
+    EDU_NO_LIMIT = 50
+
+    # 职位状态，“正在招聘” 和 “招聘结束”
+    STATUS_OPENED = 0
+    STATUS_CLOSED = -1
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64), index=True, nullable=False)
+    status = db.Column(db.SmallInteger, default=STATUS_OPENED, nullable=False)
     company_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
     salary_min = db.Column(db.Integer, default=0)
     salary_max = db.Column(db.Integer, default=0)
@@ -199,7 +212,8 @@ class Job(Base):
     work_address = db.Column(db.String(512), nullable=False)
 
     # relationship
-    resumes = db.relationship('Resume', secondary=Mailing, backref=db.backref('jobs'))
+    resumes = db.relationship('Resume', secondary=Delivery, backref=db.backref('jobs'))
+    following_users = db.relationship('User', secondary=Following, backref=db.backref('following_jobs'))
 
     def __repr__(self):
         return '<Job(id={})>'.format(self.id)

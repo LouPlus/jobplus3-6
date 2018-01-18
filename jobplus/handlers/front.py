@@ -3,7 +3,7 @@
 
 
 from flask import Blueprint, render_template
-
+from jobplus.models import Job, Company
 
 front = Blueprint('front', __name__)
 
