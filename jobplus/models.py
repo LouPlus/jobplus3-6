@@ -226,6 +226,7 @@ class Company(Base):
         pass
 
 
+
 STATUS_SENT = 1
 STATUS_CHECKED = 2
 STATUS_ACCEPTED = 3

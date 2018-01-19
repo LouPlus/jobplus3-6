@@ -11,7 +11,6 @@
 from jobplus.models import *
 from faker import Faker
 from random import randint
-import time
 
 fake = Faker()
 fake_cn = Faker('zh_CN')

@@ -6,6 +6,7 @@ from flask import Blueprint, render_template, url_for, redirect, flash, request,
 from jobplus.models import Job, User, Company, db
 from jobplus.forms import LoginForm
 from flask_login import login_user, logout_user, login_required
+
 front = Blueprint('front', __name__)
 
 
@@ -63,3 +64,4 @@ def logout():
     logout_user()
     flash('您已退出登录', 'success')
     return redirect(url_for('.index'))
+
