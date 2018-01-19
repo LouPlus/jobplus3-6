@@ -1,6 +1,25 @@
 {% extends "base.html" %}
+{% from "macros.html" import render_index_job, render_index_company %}
 {% block title %}首页{% endblock %}
 {% block body %}
-<h1>Index test</h1>
+<h1>最新职位</h1>
+<div class="row">
+{% for job in newest_jobs %}
+    {{ render_index_job(job) }}
+{% endfor %}
+</div>
+
+<h1>热门职位</h1>
+<div class="row">
+{% for job in popular_jobs %}
+    {{ render_index_job(job) }}
+{% endfor %}
+</div>
+<h1>最新企业</h1>
+<div class="row">
+{% for company_info in newest_companies_info %}
+    {{ render_index_company(company_info) }}
+{% endfor %}
+</div>
 {% endblock %}
 

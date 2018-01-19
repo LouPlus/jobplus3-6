@@ -4,6 +4,7 @@
 
 class BaseConfig(object):
     SECRET_KEY = 'makesure to set a very secret key'
+    INDEX_PER_PAGE = 10
 
 
 class DevelopmentConfig(BaseConfig):

@@ -11,6 +11,7 @@
 from jobplus.models import *
 from faker import Faker
 from random import randint
+import time
 
 fake = Faker()
 fake_cn = Faker('zh_CN')
@@ -103,8 +104,12 @@ def iter_companies(companies):
             email=fake_cn.email(),
             phone=gen_phone_num(),
             fax=gen_phone_num(),
+            industry=fake_cn.word(),
             manager_name=fake_cn.name(),
             manager_job='CEO',
+            slogan=fake_cn.sentence(),
+            products_display=fake_cn.text(),
+            description=fake_cn.text()
         )
 
 
@@ -127,8 +132,8 @@ def iter_jobs(companies):
                 title=gen_occupation(),
                 salary_min=sal_min,
                 salary_max=sal_max,
-                exp_required=randint(1, 6),
-                edu_required=randint(1, 5) * 10,
+                exp_required=randint(0, 5),
+                edu_required=randint(0, 4),
                 description=fake_cn.text()[:140],
                 work_address=company.company_info.address
             )
@@ -272,6 +277,25 @@ def run(user_num=20, company_num=20, clearing_db=False):
 
         print('正在进行模拟关注')
         simulate_following(test_seekers, test_jobs)
+
+        print('更新统计数据')
+        for resume in test_resumes:
+            resume.update_statics()
+            db.session.add(resume)
+
+        for job in test_jobs:
+            job.update_statics()
+            db.session.add(job)
+
+        for company in test_companies_info:
+            company.update_statics()
+            db.session.add(company)
+
+        for seeker in test_seekers_info:
+            seeker.update_statics()
+            db.session.add(seeker)
+
+        db.session.commit()
         print('---数据生成完毕！---')
     except Exception as e:
         print(e)
