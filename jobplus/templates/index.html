@@ -7,19 +7,38 @@
 {% for job in newest_jobs %}
     {{ render_index_job(job) }}
 {% endfor %}
+    <div class="col-md-4"></div>
+    <div class="col-md-4 check__more" >
+        <p><a href="#" class="btn btn-primary" role="button">查看更多</a>
+        </p>
+    </div>
+    <div class="col-md-4"></div>
 </div>
-
+<hr>
 <h1>热门职位</h1>
 <div class="row">
 {% for job in popular_jobs %}
     {{ render_index_job(job) }}
 {% endfor %}
+    <div class="col-md-4"></div>
+    <div class="col-md-4 check__more" >
+        <p><a href="#" class="btn btn-primary" role="button">查看更多</a>
+        </p>
+    </div>
+    <div class="col-md-4"></div>
 </div>
+<hr>
 <h1>最新企业</h1>
 <div class="row">
 {% for company_info in newest_companies_info %}
     {{ render_index_company(company_info) }}
 {% endfor %}
+    <div class="col-md-4"></div>
+    <div class="col-md-4 check__more" >
+        <p><a href="#" class="btn btn-primary" role="button">查看更多</a>
+        </p>
+    </div>
+    <div class="col-md-4"></div>
 </div>
 {% endblock %}
 

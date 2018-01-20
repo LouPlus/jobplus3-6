@@ -3,8 +3,25 @@
     <div class="thumbnail">
       <!-- <img src="..." alt="..."> -->
       <div class="caption">
-        <h3>{{ job.title }}</h3>
+        <h4>{{ job.title }}</h4>
         <p>{{ job.created_at }} 发布</p>
+          {% if job.salary_min == 0 and job.salary_max ==0 %}
+          <b>面议</>
+          {% else %}
+          <p>
+            {% if job.salary_min >= 1000 %}
+                {{ (job.salary_min/1000) | int }}K
+            {% else %}
+                {{ job.salary_min }}
+            {% endif %}
+              ~
+            {% if job.salary_max >= 1000 %}
+                {{ (job.salary_max/1000) | int }}K
+            {% else %}
+                {{ job.salary_max }}
+            {% endif %}
+          {% endif %}
+          </p>
         <p>{{ job.exp_req_list[job.exp_required] }} / {{ job.edu_req_list[job.edu_required] }} /
         {% if job.is_full_time ==True %}
         {{ '全职' }}
@@ -33,7 +50,7 @@
         <h3><b class="company__name">{{ company_info.name }}</b></h3>
         <p>{{ company_info.industry }} 行业</p>
         <p class="company__slogan">{{ company_info.slogan }}</p>
-        <p><a href="{{ company_info.url }}" class="btn btn-default" role="button">查看详情</a>
+        <p><a href="{{ company_info.url }}" class="btn btn-primary" role="button">查看详情</a>
             <!-- <a href="#" class="btn btn-default" role="button">关注</a> -->
         </p>
       </div>
