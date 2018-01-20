@@ -1,0 +1,68 @@
+{% macro render_index_job(job) %}
+  <div class="col-sm-6 col-md-4">
+    <div class="thumbnail">
+      <!-- <img src="..." alt="..."> -->
+      <div class="caption">
+        <h3>{{ job.title }}</h3>
+        <p>{{ job.created_at }} 发布</p>
+        <p>{{ job.exp_req_list[job.exp_required] }} / {{ job.edu_req_list[job.edu_required] }} /
+        {% if job.is_full_time ==True %}
+        {{ '全职' }}
+        {% else %}
+        {{ '兼职' }}
+        {% endif %}
+        </p>
+        <p><b>{{ job.user.company_info.name }}</b></p>
+        <p><a href="{{ job.url }}" class="btn btn-primary" role="button">查看</a>
+            <!-- <a href="#" class="btn btn-default" role="button">关注</a> -->
+        </p>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro render_index_company(company_info) %}
+  <div class="col-sm-3 col-md-3">
+    <div class="thumbnail">
+      {% if company_info.logo == None %}
+      <img src="{{ url_for('static', filename='img/default_logo.jpg') }}" alt="...">
+      {% else %}
+      <img src="{{ company_info.logo }}" alt="...">
+      {% endif %}
+      <div class="caption">
+        <h3><b class="company__name">{{ company_info.name }}</b></h3>
+        <p>{{ company_info.industry }} 行业</p>
+        <p class="company__slogan">{{ company_info.slogan }}</p>
+        <p><a href="{{ company_info.url }}" class="btn btn-default" role="button">查看详情</a>
+            <!-- <a href="#" class="btn btn-default" role="button">关注</a> -->
+        </p>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro render_form(form, url) %}
+<form method="POST" action="{{ url }}">
+    {{ form.csrf_token }}
+    {% for field in form %}
+        {% if field.type == 'CSRFTokenField' %}
+            {{ '' }}
+            {% elif field.type == 'SubmitField' %}
+            {{ form.submit(class='btn btn-primary', type='submit') }}
+            {% elif field.type == 'BooleanField' %}
+            <div class="checkbox">
+                <label>{{ field() }} {{ field.label.text }}</label>
+            </div>
+        {% else %}
+            <div class="form-group {% if field.errors %}has-error{% endif %}">
+            {{ field.label }}  {{ field(class='form-control') }}
+            {% if field.errors %}
+                {% for error in field.errors %}
+                <span class="help-block">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+</form>
+{% endmacro %}

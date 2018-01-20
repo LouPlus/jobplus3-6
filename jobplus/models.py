@@ -5,6 +5,7 @@ from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from flask import url_for
 
 db = SQLAlchemy()
 
@@ -15,7 +16,7 @@ class Base(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow())
 
 
-class User(Base):
+class User(Base, UserMixin):
     __tablename__ = 'user'
 
     ROLE_ADMIN = 10
@@ -100,8 +101,23 @@ class Seeker(Base):
     # 工作年限：0~11，11表示十年以上
     service_year = db.Column(db.SmallInteger, default=0, nullable=False)
 
+    # statics
+    # 关注的职位数量
+    jobs_following_number = db.Column(db.Integer, default=0)
+
     def __repr__(self):
         return '<Seeker(id={}, name={})>'.format(self.id, self.name)
+
+    def update_statics(self):
+        resumes = self.user.resumes
+        self.jobs_following_number = 0
+        for resume in resumes:
+            self.jobs_following_number += len(resume.jobs)
+
+    # TODO 个人主页的链接
+    @property
+    def url(self):
+        pass
 
 
 # 简历表使用 MongoDB, 但暂时写个MySQL原型
@@ -129,8 +145,20 @@ class Resume(Base):
     expect_job = db.Column(db.String(64))
     attachment = db.Column(db.String(256))
 
+    # statics
+    # 已投递的职位数量
+    jobs_applied_number = db.Column(db.Integer, default=0)
+
     def __repr__(self):
         return '<Resume(id={})>'.format(self.id)
+
+    def update_statics(self):
+        self.jobs_applied_number = len(self.jobs)
+
+    # TODO 到简历详情页的链接
+    @property
+    def url(self):
+        pass
 
 
 class Company(Base):
@@ -162,8 +190,41 @@ class Company(Base):
     manager_job = db.Column(db.String(32))
     manager_photo = db.Column(db.String(256))
 
+    slogan = db.Column(db.String(140))
+    products_display = db.Column(db.Text)
+    description = db.Column(db.Text)
+    # 统计数据
+    # 发布的职位数
+    jobs_number = db.Column(db.Integer, default=0)
+    # 正在招聘的职位数
+    jobs_available = db.Column(db.Integer, default=0)
+    # 收到的简历数量
+    total_resume_number = db.Column(db.Integer, default=0)
+    # 所有职位的总关注人数
+    total_job_followers = db.Column(db.Integer, default=0)
+
     def __repr__(self):
         return '<Company(id={})>'.format(self.id)
+
+    def update_statics(self):
+        jobs = self.user.jobs
+        self.jobs_number = len(jobs)
+
+        # 正在招聘的职位数
+        self.jobs_available = 0
+        self.total_resume_number = 0
+        self.total_job_followers = 0
+        for job in jobs:
+            if job.status == Job.STATUS_OPENED:
+                self.jobs_available += 1
+            self.total_resume_number += len(job.resumes)
+            self.total_job_followers += len(job.following_users)
+
+    @property
+    def url(self):
+        # TODO 生成公司主页
+        pass
+
 
 
 STATUS_SENT = 1
@@ -172,15 +233,15 @@ STATUS_ACCEPTED = 3
 STATUS_REJECTED = 4
 
 Delivery = db.Table('delivery',
-                    db.Column('resume_id', db.Integer, db.ForeignKey('resume.id'), primary_key=True),
-                    db.Column('job_id', db.Integer, db.ForeignKey('job.id'), primary_key=True),
+                    db.Column('resume_id', db.Integer, db.ForeignKey('resume.id', ondelete='CASCADE'), primary_key=True),
+                    db.Column('job_id', db.Integer, db.ForeignKey('job.id', ondelete='CASCADE'), primary_key=True),
                     db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
                     )
 
 # 用户可以关注某个职位
 Following = db.Table('following',
-                     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-                     db.Column('job_id', db.Integer, db.ForeignKey('job.id'), primary_key=True),
+                     db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
+                     db.Column('job_id', db.Integer, db.ForeignKey('job.id', ondelete='CASCADE'), primary_key=True),
                      db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
                      )
 
@@ -189,20 +250,30 @@ class Job(Base):
     __tablename__ = 'job'
 
     # 受教育程度
-    EDU_COLLEGE = 10
-    EDU_BACHELOR = 20
-    EDU_MASTER = 30
-    EDU_PHD = 40
-    EDU_NO_LIMIT = 50
+    EDU_COLLEGE = 0
+    EDU_BACHELOR = 1
+    EDU_MASTER = 2
+    EDU_PHD = 3
+    EDU_NO_LIMIT = 4
+    edu_req_list = ['不限', '专科', '本科', '硕士', '博士']
 
     # 职位状态，“正在招聘” 和 “招聘结束”
     STATUS_OPENED = 0
     STATUS_CLOSED = -1
 
+    # 经验要求
+    EXP_REQ_NO_LIMIT = 0
+    EXP_REQ_GRADUATE = 1
+    EXP_REQ_3_LESS = 2
+    EXP_REQ_3_5 = 3
+    EXP_REQ_5_10 = 4
+    EXP_REQ_10_MORE = 5
+    exp_req_list = ['不要求', '应届毕业生', '3年及以下', '3-5年', '5-10年', '10年以上']
+
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64), index=True, nullable=False)
     status = db.Column(db.SmallInteger, default=STATUS_OPENED, nullable=False)
-    company_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
     salary_min = db.Column(db.Integer, default=0)
     salary_max = db.Column(db.Integer, default=0)
     exp_required = db.Column(db.Integer, default=0)
@@ -215,5 +286,21 @@ class Job(Base):
     resumes = db.relationship('Resume', secondary=Delivery, backref=db.backref('jobs'))
     following_users = db.relationship('User', secondary=Following, backref=db.backref('following_jobs'))
 
+    # statics
+    # 收到的简历数量
+    resume_number = db.Column(db.Integer, default=0)
+    # 关注者数量
+    follower_number = db.Column(db.Integer, default=0)
+
     def __repr__(self):
         return '<Job(id={})>'.format(self.id)
+
+    @property
+    def url(self):
+        # TODO 跳转到职位详情页
+        pass
+        # return url_for('job.detail', course=self.id)
+
+    def update_statics(self):
+        self.resume_number = len(self.resumes)
+        self.follower_number = len(self.following_users)
