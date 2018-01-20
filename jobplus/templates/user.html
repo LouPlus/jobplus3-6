@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}个人中心{% endblock %}
+{% block body %}
+    <h1>个人中心</h1>
+
+    <form action="{{ url_for('seeker.profile') }}", method="post">
+    <div class="form-group">
+         {{ form.username.label }}{{ form.username(class='form-control') }}
+    </div>
+    <div>
+        {{ form.gender.label }}
+        <lablel class="radio-inline row">
+             {{ form.gender }}
+        </lablel>
+
+    </div>
+
+    <div class="form-group">
+         {{ form.phone.label }}{{ form.phone(class='form-control') }}
+    </div>
+
+    <div class="form-group">
+         {{ form.name.label }}{{ form.name(class='form-control') }}
+    </div>
+    <div class="form-group">
+         {{ form.college.label }}{{ form.college(class='form-control') }}
+    </div>
+    <div>
+        {{ form.education.label }}
+        {{ form.education(class="form-control") }}
+    </div>
+
+    <div>
+        {{ form.major.label }}
+        {{ form.major(class="form-control") }}
+    </div>
+
+    <div>
+        {{ form.service_year.label }}
+        {{ form.service_year(class="form-control") }}年
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+    </form>
+
+{% endblock %}
+

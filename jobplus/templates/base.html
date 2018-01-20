@@ -12,6 +12,16 @@
     <body>
         <nav class="navbar navbar-default navbar-fixed-top">
             <div class="container">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                  {% for category, message in messages %}
+                  <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    {{ message }}
+                  </div>
+                  {% endfor %}
+                  {% endif %}
+              {% endwith %}
                 <!-- Brand and toggle get group for better mobile display -->
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -32,14 +42,14 @@
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href="#">公司注册</a></li>
-                        <li><a href="#">求职者注册</a></li>
+                        <li><a href="{{ url_for('seeker.register') }}">求职者注册</a></li>
                         <li><a href="#">登录</a></li>
                     </ul>
                 </div>
             </div>
         </nav>
 
-        <div class="container">
+        <div id="container" class="container">
             {% block body %}{% endblock %}
         </div>
 
@@ -51,7 +61,7 @@
                 </div>
         </footer>
         <!-- 引入Bootstrap jQuery 依赖 -->
-        <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
-        <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     </body>
 </html>
