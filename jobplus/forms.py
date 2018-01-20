@@ -31,11 +31,11 @@ class UserinfoForm(FlaskForm):
     name = StringField('真实姓名', validators=[Required(), Length(3, 24)])
     college = StringField('毕业院校', validators=[Required(), Length(3, 24)])
     education = SelectField('学历', choices=[
-        ('10', '大专'),
-        ('20', '本科'),
-        ('40', '研究生'),
-        ('30', '博士'),
-        ('50', '其他')
+        ('1', '专科'),
+        ('2', '本科'),
+        ('4', '硕士'),
+        ('3', '博士'),
+        ('5', '其他')
     ])
     major = StringField('专业',validators=[Required(), Length(3, 24)])
     service_year = IntegerField('工作年限',validators=[Required()])
