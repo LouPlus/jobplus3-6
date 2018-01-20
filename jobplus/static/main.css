@@ -1,1 +1,22 @@
 body { padding-top: 70px; }
+
+a,
+a:hover,
+a:visited {
+  text-decoration: none !important;
+}
+
+.company__name,
+.company__slogan {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap
+}
+.company img {
+  height: 160px !important;
+}
+
+.form {
+  width: 400px;
+  margin: 0 auto;
+}

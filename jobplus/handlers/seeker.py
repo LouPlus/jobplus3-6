@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+
 from flask import Blueprint, render_template, flash, url_for, redirect
 from jobplus.forms import UserinfoForm, SeekerRegisterForm
 
@@ -25,3 +26,4 @@ def register():
         flash('注册成功，请登录！', 'success')
         return redirect(url_for('.profile'))
     return render_template('seeker_register.html', form=form)
+
