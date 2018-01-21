@@ -5,8 +5,11 @@
 from flask import Flask
 from flask_migrate import Migrate
 from flask_login import LoginManager
+from flask_uploads import configure_uploads, patch_request_class
+
 from jobplus.config import configs
 from jobplus.models import db, User
+from jobplus.forms import photos
 
 
 def register_blueprints(app):
@@ -43,5 +46,8 @@ def create_app(config):
 
     register_blueprints(app)
     register_extensions(app)
+    db.init_app(app)
+    Migrate(app, db)
+    configure_uploads(app, photos)
     return app
 
