@@ -65,7 +65,6 @@ def iter_seekers(seekers):
     :return:
     """
     gender_list = [10, 20]
-    edu_list = [10, 20, 30, 40, 50]
     for seeker in seekers:
         name = fake_cn.name()
         # print('Creating seeker: {}'.format(name))
@@ -75,7 +74,7 @@ def iter_seekers(seekers):
             phone=gen_phone_num(),
             name=name,
             college=fake_cn.word() + '大学',
-            education=edu_list[randint(0, 4)],
+            education=randint(0, 4),
             major=fake_cn.word() + '工程',
             service_year=randint(0, 11)
         )
@@ -132,7 +131,7 @@ def iter_jobs(companies):
                 salary_min=sal_min,
                 salary_max=sal_max,
                 exp_required=randint(0, 5),
-                edu_required=randint(0, 4),
+                edu_required=randint(0, 5),
                 description=fake_cn.text()[:140],
                 work_address=company.company_info.address
             )

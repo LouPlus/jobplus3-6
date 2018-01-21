@@ -20,3 +20,9 @@ a:visited {
   width: 400px;
   margin: 0 auto;
 }
+
+.check__more{
+    height: 60px;
+    text-align: center;
+    margin-top: 10px;
+}

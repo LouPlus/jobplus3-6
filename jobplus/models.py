@@ -75,11 +75,11 @@ class Seeker(Base):
     GENDER_M = 10
     GENDER_F = 20
     # 受教育程度
-    EDU_COLLEGE = 10
-    EDU_BACHELOR = 20
-    EDU_MASTER = 30
-    EDU_PHD = 40
-    EDU_OTHER = 50
+    EDU_COLLEGE = 1
+    EDU_BACHELOR = 2
+    EDU_MASTER = 3
+    EDU_PHD = 4
+    EDU_OTHER = 5
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
@@ -226,7 +226,6 @@ class Company(Base):
         pass
 
 
-
 STATUS_SENT = 1
 STATUS_CHECKED = 2
 STATUS_ACCEPTED = 3
@@ -250,12 +249,13 @@ class Job(Base):
     __tablename__ = 'job'
 
     # 受教育程度
-    EDU_COLLEGE = 0
-    EDU_BACHELOR = 1
-    EDU_MASTER = 2
-    EDU_PHD = 3
-    EDU_NO_LIMIT = 4
-    edu_req_list = ['不限', '专科', '本科', '硕士', '博士']
+    EDU_NO_LIMIT = 0
+    EDU_COLLEGE = 1
+    EDU_BACHELOR = 2
+    EDU_MASTER = 3
+    EDU_PHD = 4
+    EDU_OTHER = 5
+    edu_req_list = ['不限', '专科', '本科', '硕士', '博士', '其他']
 
     # 职位状态，“正在招聘” 和 “招聘结束”
     STATUS_OPENED = 0

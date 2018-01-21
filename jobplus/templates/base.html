@@ -33,14 +33,14 @@
                     <ul class="nav navbar-nav navbar-right">
 
                     {% if not current_user.is_authenticated %}
-                        <li><a href="#">公司注册</a></li>
-                        <li><a href="#">求职者注册</a></li>
+                        <li><a href="#">企业注册</a></li>
+                        <li><a href="{{ url_for('seeker.register') }}">用户注册</a></li>
                         <li><a href="{{ url_for('front.login') }}">登录</a></li>
                     {% else %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ current_user.username }}<span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#">个人主页</a></li>
+                                <li><a href="{{ url_for('seeker.profile') }}">个人主页</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{{ url_for('front.logout') }}">退出登录</a></li>
                             </ul>
@@ -68,7 +68,8 @@
             {% block body %}{% endblock %}
         </div>
 
-        <footer class="footer text-center navbar-fixed-bottom">
+        <footer class="footer text-center">
+            <hr>
                 <div class="container">
                         {% block footer %}
                         &copy;Copyright 2018 by <a href="https://github.com/LouPlus/jobplus3-6">Louplus 3-6</a>
