@@ -176,6 +176,7 @@ class Company(Base):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
 
+    logo = db.Column(db.String(256), default=DEFAULT_LOGO_URL)    
     name = db.Column(db.String(128), unique=True, nullable=False, index=True)
     found_date = db.Column(db.DateTime, default=datetime.utcnow(), nullable=False)
     city = db.Column(db.String(32), default='北京', nullable=False)
@@ -185,7 +186,6 @@ class Company(Base):
     email = db.Column(db.String(64), nullable=False)
     phone = db.Column(db.String(16), nullable=False)
     fax = db.Column(db.String(16))
-    logo = db.Column(db.String(256), default=DEFAULT_LOGO_URL)
     manager_name = db.Column(db.String(32))
     manager_job = db.Column(db.String(32))
     manager_photo = db.Column(db.String(256))
