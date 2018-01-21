@@ -4,12 +4,12 @@
 import datetime
 
 from flask_wtf import FlaskForm
-
 from flask_uploads import UploadSet, IMAGES
 from flask_login import current_user
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField, IntegerField, RadioField, SelectField 
 from wtforms.validators import Length, Email, EqualTo, DataRequired, URL, NumberRange
+
 from jobplus.models import db, User, Seeker, Company, Resume, Job
 
 
