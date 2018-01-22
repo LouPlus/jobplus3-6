@@ -1,6 +1,6 @@
 .python-version
 .idea
 __pycache__
-migrations
 .vscode
+migrations
 .idea
