@@ -4,29 +4,33 @@
       <!-- <img src="..." alt="..."> -->
       <div class="caption">
         <h4>{{ job.title }}</h4>
-        <p>{{ job.created_at }} 发布</p>
+        <p>{{ job.created_at | timesince }} 发布</p>
           {% if job.salary_min == 0 and job.salary_max ==0 %}
-          <b>面议</>
+          <b>面议</b>
           {% else %}
-          <p>
+          <b>
             {% if job.salary_min >= 1000 %}
-                {{ (job.salary_min/1000) | int }}K
+                {{ (job.salary_min//1000) }}K
             {% else %}
                 {{ job.salary_min }}
             {% endif %}
               ~
             {% if job.salary_max >= 1000 %}
-                {{ (job.salary_max/1000) | int }}K
+                {% if (job.salary_max//1000) == (job.salary_min//1000) %}
+                    {{ (job.salary_max//1000) + 1 }}K
+                {% else %}
+                {{ (job.salary_max//1000) }}K
+                {% endif %}
             {% else %}
                 {{ job.salary_max }}
             {% endif %}
           {% endif %}
-          </p>
+          </b>
         <p>{{ job.exp_req_list[job.exp_required] }} / {{ job.edu_req_list[job.edu_required] }} /
         {% if job.is_full_time ==True %}
-        {{ '全职' }}
+            全职
         {% else %}
-        {{ '兼职' }}
+            兼职
         {% endif %}
         </p>
         <p><b>{{ job.user.company_info.name }}</b></p>
