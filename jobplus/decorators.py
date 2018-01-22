@@ -25,7 +25,6 @@ def role_required(role_type):
         return wrapper
     return decorator
 
-
 seeker_required = role_required(User.ROLE_SEEKER)
 company_required = role_required(User.ROLE_COMPANY)
 admin_required = role_required(User.ROLE_ADMIN)
