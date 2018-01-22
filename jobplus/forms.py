@@ -156,8 +156,11 @@ class CompanyProfileForm(FlaskForm):
     """ 企业详情表单 """
 
     #TODO 图片上传功能表单BUG修复
-    #logo = FileField('企业LOGO', validators=[FileAllowed(photos, '只能上传图片！'), FileRequired('文件未选择！')])
+    logo = FileField('企业LOGO', validators=[FileAllowed(photos, '只能上传图片！'), FileRequired('文件未选择！')])
     name = StringField('企业名称', validators=[DataRequired(), Length(4, 128)])
+    email = StringField('邮箱', validators=[DataRequired(), Email()])
+    phone = StringField('联系电话', validators=[DataRequired(), Length(5, 32)])
+    fax = StringField('传真')
     found_date = StringField('企业创建时间',default=datetime.datetime.now().strftime("%Y-%m-%d"))
     city = StringField('企业所在城市')
     address = StringField('企业地址', validators=[Length(8, 128)])
@@ -169,9 +172,8 @@ class CompanyProfileForm(FlaskForm):
         ('4', '大于500人')
         ])
     industry = StringField('所在行业')
-    email = StringField('邮箱', validators=[DataRequired(), Email()])
-    phone = StringField('联系电话', validators=[DataRequired(), Length(5, 32)])
-    fax = StringField('传真')
+    slogan = StringField('一句话简介')
+    products_display = TextAreaField('企业产品简介')
     manager_name = StringField('招聘负责人', validators=[DataRequired()])
     manager_job = StringField('负责人职位')
     # manager_photo = FileField('负责人头像', validators=[FileAllowed(photos, '只能上传图片'), FileRequired('文件未选择！')])
@@ -186,14 +188,14 @@ class CompanyProfileForm(FlaskForm):
         company = Company()
         
         #TODO 图片上传功能BUG修复
-        #logo = photos.save(self.logo.data)
+        logo = photos.save(self.logo.data)
         #photo = photos.save(self.manager_photo.data)
         # photo_path = photo.path(photo)
         # logo_path = companyimg.path(logo)
 
         company.user_id = user_id
         company.name = self.name.data
-        # company.logo = logo
+        company.logo = logo
         company.found_date = self.found_date.data
         company.city = self.city.data
         company.address = self.address.data
