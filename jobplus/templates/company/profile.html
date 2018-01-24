@@ -15,6 +15,7 @@
   <h2>企业注册</h2>
  {{ render_form(form, url_for('company.company_profile')) }}
 </div>
+
 {% endblock %}
 
 {% block tail_js %}
@@ -22,5 +23,24 @@
         <script src="/static/js/fileinput.min.js"></script>
         <script src="/static/js/fileinput_locale_zh.js"></script>
         <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
-        <script src="/static/js/bootstrap-datetimepicker.zh-CN.js"></script>
+        <script type="text/javascript" src="/static/js/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+        <script type="text/javascript">
+            $('#datetimepicker').datetimepicker({
+                format: 'yyyy-mm-dd',
+                language: 'zh-CN',
+                minView: "month",
+                autoclose: true,
+                todayBtn: true,
+            });
+        </script>
+        <script type="text/javascript">
+           $(".file").fileinput({
+                language:'zh',
+                showUpload: false, 
+                enctype: 'multipart/form-data',
+                showBrowse: true,
+                browseClass:"btn btn-primary",
+                // msgPlaceholder: '请选择图片文件'                
+            　　})
+        </script>
 {% endblock %}

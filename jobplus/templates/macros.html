@@ -76,6 +76,17 @@
     </div>
     {% elif field.type == 'FileField' %}
       {{ field.label }} {{ field(class='file form-control',accept="image/png,image/bmp,image/jpeg") }}
+
+    {% elif field.type == 'DateField' %}
+    <div class="form-group">
+      {{ field.label }}
+      <div class='input-group date' id='datetimepicker'>
+        {{ field(class='form-control') }}
+        <span class="input-group-addon">  
+          <span class="glyphicon glyphicon-calendar"></span>  
+        </span>  
+      </div>
+    </div>
       {% if field.errors %}
         {% for error in field.errors %}
         <span class="help-block">{{ error }}</span>

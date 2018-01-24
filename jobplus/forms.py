@@ -124,7 +124,7 @@ class SeekerRegisterForm(FlaskForm):
 class CompanyRegisterForm(FlaskForm):
     """ 企业注册页面表单模型 """
 
-    username = StringField('用户名', validators=[DataRequired(message='请输入用户名'), Length(4, 24, message='用户名长度请在4-24位'), Regexp('^[\u4E00-\u9FA5a-zA-Z0-9_]{4,24}$',message='请使用数字字符和下划线')])
+    username = StringField('用户名', validators=[DataRequired(message='请输入用户名'), Length(4, 24, message='用户名长度请在4-24位'), Regexp('^[a-zA-Z0-9_]{4,24}$',message='请使用数字字符和下划线')])
     email = StringField('邮箱', validators=[DataRequired('请输入邮箱'), Email(message='请输入合法的Email地址')])
     password = PasswordField('密码', validators=[DataRequired('请输入密码'), Length(6, 24)])
     repeat_password = PasswordField('重复密码', validators=[DataRequired('请重复输入密码'), EqualTo('password')])
@@ -157,8 +157,8 @@ photos = UploadSet('photos', IMAGES)
 class CompanyProfileForm(FlaskForm):
     """ 企业详情表单 """
 
-    logo = FileField('企业LOGO', validators=[FileAllowed(photos, '只能上传图片文件！'), FileRequired('文件未选择！')])
-    name = StringField('企业名称', validators=[DataRequired(message='请输入企业名称'), Length(4, 128)])
+    logo = FileField('企业LOGO', validators=[FileAllowed(photos, '只能上传图片文件！'),FileRequired('文件未选择！')])
+    name = StringField('企业名称', validators=[DataRequired(message='请输入企业名称'), Length(4, 128)], render_kw={"placeholder":"请输入企业名称"})
     email = StringField('简历邮箱', validators=[DataRequired(message='请输入接受简历的企业邮箱'), Email()])
     phone = StringField('联系电话', validators=[DataRequired(message='请输入联系电话'), Length(5, 32)])
     fax = StringField('传真')
