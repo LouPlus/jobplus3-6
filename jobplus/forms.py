@@ -11,7 +11,7 @@ from flask_login import current_user
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from werkzeug.utils import secure_filename
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField, SelectField, DateField
-from wtforms.validators import Length, Email, EqualTo, DataRequired, Regexp
+from wtforms.validators import Length, Email, EqualTo, DataRequired, Regexp, URL
 
 from jobplus.models import db, User, Seeker, Company
 
@@ -159,6 +159,10 @@ class CompanyProfileForm(FlaskForm):
 
     logo = FileField('企业LOGO', validators=[FileAllowed(photos, '只能上传图片文件！'),FileRequired('文件未选择！')])
     name = StringField('企业名称', validators=[DataRequired(message='请输入企业名称'), Length(4, 128)], render_kw={"placeholder":"请输入企业名称"})
+    web_url = StringField('企业网址', validators=[DataRequired(message='请输入企业网址'), Length(5,256), URL],render_kw={"placeholder":"请输入企业网站地址"})
+    manager_name = StringField('招聘负责人', validators=[DataRequired(message='请输入招聘负责人姓名')])
+    manager_job = StringField('负责人职位')
+    manager_img = FileField('负责人头像', validators=[FileAllowed(photos, '只能上传图片'), FileRequired('文件未选择！')])
     email = StringField('简历邮箱', validators=[DataRequired(message='请输入接受简历的企业邮箱'), Email()])
     phone = StringField('联系电话', validators=[DataRequired(message='请输入联系电话'), Length(5, 32)])
     fax = StringField('传真')
@@ -174,9 +178,7 @@ class CompanyProfileForm(FlaskForm):
     industry = StringField('所在行业')
     slogan = StringField('一句话简介')
     products_display = TextAreaField('企业产品简介')
-    manager_name = StringField('招聘负责人', validators=[DataRequired(message='请输入招聘负责人姓名')])
-    manager_job = StringField('负责人职位')
-    manager_img = FileField('负责人头像', validators=[FileAllowed(photos, '只能上传图片'), FileRequired('文件未选择！')])
+    description = TextAreaField('企业描述', render_kw={"placeholder":"请输入企业描述信息"})
     submit = SubmitField('提交')
 
     def validate_name(self, field):
@@ -196,11 +198,13 @@ class CompanyProfileForm(FlaskForm):
         logo_file = photos.save(logo, name=logo_name)
         manager_img_file = photos.save(manager_img, name=manager_img_name)
 
-        img_path = current_app.config['UPLOADED_PHOTOS_DEST']
+        # img_path = current_app.config['UPLOADED_PHOTOS_DEST']
+        img_path = 'static/company_img'
 
         company.user_id = user_id
         company.name = self.name.data
         company.logo = os.path.join(img_path, logo_file)
+        company.web_url = self.web_url.data
         company.found_date = self.found_date.data
         company.city = self.city.data
         company.address = self.address.data
@@ -212,5 +216,8 @@ class CompanyProfileForm(FlaskForm):
         company.manager_name = self.manager_name.data
         company.manager_job = self.manager_job.data
         company.manager_photo = os.path.join(img_path, manager_img_file)
+        company.slogan = self.slogan.data
+        company.products_display = self.products_display.data
+        company.description = self.description.data
         db.session.add(company)
         db.session.commit()
