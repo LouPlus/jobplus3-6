@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="row">
+  <div class="col-xs-12 col-md-9 main">
+    <h1>企业列表</h1>
+    {% for company in company %}
+    <div class="company-list">
+      <div class="row" style="margin-right: 0;">
+        ::before
+        <div class="media">
+          <div class="col-md-9">
+            <div class="pull-left">
+              <div class="thumbnail">
+                <a href="{{ company.url }}" class="comany-logo" target="_blank">
+                  <img src="{{ company.logo }}" alt="company-logo">
+                </a>
+              </div>
+            </div>
+            <div class="media-body" style="padding-left: 12px;">
+              <h4 class="media-heading" id="media-heading">
+                <a href="{{ company.url }}">{{ conpamy.name }}</a>
+              </h4>
+              <a class="company-site" target="_blank" rel="nofollow" href="{{ company.web_url }}">{{ company.web_url }}</a>
+              <p class="company-desc">{{ company.slogan }}</p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <ul class="company-list-single-info">
+              <li class="text-mued">
+                  <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                  <a class="company-list-single-info-num" target="_blank" href="#"><span>{{ company.jobs_available }}</span></a>
+                  <span>个在招职位</span>
+              </li>
+              <li class="text-mued">
+                  <span class="glyphicon glyphicon-calender" aria-hidden="true"></span>
+                  <span>成立时间:{{ company.found_date }}</span>
+              </li>
+              <li class="test-mued">
+                  <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
+                  <span>{{ company.city }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

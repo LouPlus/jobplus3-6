@@ -176,7 +176,8 @@ class Company(Base):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
 
-    logo = db.Column(db.String(256), default=DEFAULT_LOGO_URL)    
+    logo = db.Column(db.String(256), default=DEFAULT_LOGO_URL)
+    web_url = db.Column(db.String(256), nullable=False)
     name = db.Column(db.String(128), unique=True, nullable=False, index=True)
     found_date = db.Column(db.DateTime, default=datetime.utcnow(), nullable=False)
     city = db.Column(db.String(32), default='北京', nullable=False)
@@ -222,8 +223,7 @@ class Company(Base):
 
     @property
     def url(self):
-        # TODO 生成公司主页
-        pass
+        return url_for('company.company_detail', company_id=self.id)
 
 
 STATUS_SENT = 1
