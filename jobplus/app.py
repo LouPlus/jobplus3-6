@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+import datetime
 
 from flask import Flask
 from flask_migrate import Migrate
@@ -10,8 +11,6 @@ from flask_uploads import configure_uploads, patch_request_class
 from jobplus.config import configs
 from jobplus.models import db, User
 from jobplus.forms import photos
-
-import datetime
 
 
 def register_filters(app):
