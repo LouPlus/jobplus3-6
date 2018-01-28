@@ -57,7 +57,7 @@ def register_filters(app):
     @app.template_filter()
     def ex_link(url):
         url = str(url)
-        if 'http://' in url or 'https' in url:
+        if 'http://' in url or 'https://' in url:
             return url
         else:
             return "http://" + str(url)
