@@ -7,8 +7,8 @@
 
 import re
 
-from jobplusspider.items import CompanyItem, ManagerItem
 from scrapy.exceptions import DropItem
+from jobplusspider.items import CompanyItem, ManagerItem
 import codecs
 import json
 
