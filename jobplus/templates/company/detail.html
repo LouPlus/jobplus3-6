@@ -97,17 +97,3 @@
     </div>
 </div>
 {% endblock %}
-
-{% block tail_js %}
-{{ super() }}
-<script>
-        $(function() {
-            $(".follow").click(function(){
-                $(this).button('loading').delay(1000).queue(function() {
-                $(this).button.addClass('disabled');
-                // $(this).dequeue(); 
-                });
-            });
-        });  
-    </script>
-{% endblock %}
