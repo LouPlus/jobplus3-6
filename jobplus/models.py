@@ -242,8 +242,12 @@ class Company(Base):
 
     def get_img(self, img):
         if img == 'logo':
+            if 'https' in self.logo or 'http' in self.logo:
+                return self.logo
             return '/static/company_img/' + self.logo
         if img == 'manager_photo':
+            if 'https' in self.manager_photo or 'http' in self.manager_photo:
+                return self.manager_photo
             return '/static/company_img/' + self.manager_photo
  
 
