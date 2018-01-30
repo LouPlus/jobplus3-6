@@ -7,6 +7,7 @@ import os
 class BaseConfig(object):
     SECRET_KEY = 'makesure to set a very secret key'
     INDEX_PER_PAGE = 10
+    LIST_PER_PAGE = 15
 
 
 class DevelopmentConfig(BaseConfig):

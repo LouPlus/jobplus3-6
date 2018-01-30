@@ -161,6 +161,12 @@ class Resume(Base):
         pass
 
 
+# 用户关注企业表
+Company_follows = db.Table('company_follows',
+                        db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'),primary_key=True),
+                        db.Column('company_id', db.Integer, db.ForeignKey('company.id', ondelete='CASCADE'), primary_key=True))
+
+
 class Company(Base):
     __tablename__ = 'company'
 
@@ -176,7 +182,8 @@ class Company(Base):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
 
-    logo = db.Column(db.String(256), default=DEFAULT_LOGO_URL)    
+    logo = db.Column(db.String(256), default=DEFAULT_LOGO_URL)
+    web_url = db.Column(db.String(256), nullable=False)
     name = db.Column(db.String(128), unique=True, nullable=False, index=True)
     found_date = db.Column(db.DateTime, default=datetime.utcnow(), nullable=False)
     city = db.Column(db.String(32), default='北京', nullable=False)
@@ -202,6 +209,10 @@ class Company(Base):
     total_resume_number = db.Column(db.Integer, default=0)
     # 所有职位的总关注人数
     total_job_followers = db.Column(db.Integer, default=0)
+    view_count = db.Column(db.Integer)
+
+    job = db.relationship('Job')
+    follows = db.relationship('User', secondary=Company_follows, backref=db.backref('company_follows'))
 
     def __repr__(self):
         return '<Company(id={})>'.format(self.id)
@@ -221,10 +232,20 @@ class Company(Base):
             self.total_job_followers += len(job.following_users)
 
     @property
-    def url(self):
-        # TODO 生成公司主页
-        pass
+    def detail_url(self):
+        return url_for('company.company_detail', company_id=self.id)
+    
+    @property
+    def new_job(self):
+        # return self.job.query.order_by(db.desc(self.job.id)).first()
+        return Job.query.first()
 
+    def get_img(self, img):
+        if img == 'logo':
+            return '/static/company_img/' + self.logo
+        if img == 'manager_photo':
+            return '/static/company_img/' + self.manager_photo
+ 
 
 STATUS_SENT = 1
 STATUS_CHECKED = 2
@@ -281,6 +302,7 @@ class Job(Base):
     is_full_time = db.Column(db.Boolean, default=True, nullable=False)
     description = db.Column(db.Text, nullable=False)
     work_address = db.Column(db.String(512), nullable=False)
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id', ondelete='CASCADE'))
 
     # relationship
     resumes = db.relationship('Resume', secondary=Delivery, backref=db.backref('jobs'))
