@@ -102,6 +102,8 @@ def iter_companies(companies):
             email=fake_cn.email(),
             phone=gen_phone_num(),
             fax=gen_phone_num(),
+            # TODO 默认公司logo
+            logo='avatar_default.jpg',
             industry=fake_cn.word(),
             manager_name=fake_cn.name(),
             manager_job='CEO',
@@ -298,3 +300,4 @@ def run(user_num=20, company_num=20, clearing_db=False):
     except Exception as e:
         print(e)
         db.session.rollback()
+# TODO Update

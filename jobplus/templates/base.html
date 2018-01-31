@@ -29,7 +29,7 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-colapse-1">
                     <ul class="nav navbar-nav" style="margin-left: 50px;" >
                         <li class="active"><a href="/">首页<span class="sr-only"></span></a></li>
-                        <li><a href="#">职位</a></li>
+                        <li><a href="{{ url_for('job.list') }}">职位</a></li>
                         <li><a href="{{ url_for('company.company_list') }}">公司</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
