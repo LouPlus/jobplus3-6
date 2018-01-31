@@ -52,7 +52,7 @@ def register_filters(app):
     
     @app.template_filter()
     def sentence_split(sentence):
-        return re.split(r",|\.|;|，|；|、|\s|/|\\", sentence)
+        return re.split(r",|\.|;|，|；|、|/|\\", sentence)
 
     @app.template_filter()
     def ex_link(url):

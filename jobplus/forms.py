@@ -163,7 +163,7 @@ class CompanyProfileForm(FlaskForm):
                                 render_kw={"placeholder":"请输入公司名称"})
     web_url = StringField('公司网址', validators=[DataRequired(message='请输入公司网址'), Length(5,256), URL],
                                 render_kw={"placeholder":"请输入公司网站地址"})
-    manager_name = StringField('招聘负责人', validators=[DataRequired(message='请输入招聘负责人姓名')], 
+    manager_name = StringField('招聘负责人', validators=[DataRequired(message='请输入招聘负责人姓名'), Length(1,64)], 
                                 render_kw={"placeholder":"请输入招聘负责人"})
     manager_job = StringField('负责人职位', validators=[DataRequired(message='请输入招聘负责人职位')], 
                                 render_kw={"placeholder":"请输入招聘负责人职位"})

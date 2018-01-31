@@ -48,7 +48,7 @@
       {% if company_info.logo == None %}
       <img src="{{ url_for('static', filename='img/default_logo.jpg') }}" alt="...">
       {% else %}
-      <img width="100px" height="100px" src="/static/company_img/{{ company_info.logo }}" alt="...">
+      <img width="100px" height="100px" src="{{ company_info.get_img('logo') }}" alt="...">
       {% endif %}
       <div class="caption">
         <h3><b class="company__name">{{ company_info.name }}</b></h3>
