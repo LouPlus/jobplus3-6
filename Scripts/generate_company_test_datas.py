@@ -11,6 +11,7 @@ from jobplus.models import db, User, Company, Job
 
 
 
+
 fake = Faker(locale='zh-cn')
 email_set = set()
 

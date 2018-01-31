@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import scrapy
 from jobplusspider.items import ManagerItem
 
