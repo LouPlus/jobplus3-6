@@ -106,24 +106,65 @@
 </form>
 {% endmacro %}
 
+{% macro render_job_list(job) %}
+  <div class="col-sm-6 col-md-4">
+    <div class="thumbnail">
+      <!-- <img src="..." alt="..."> -->
+      <div class="caption">
+        <h4>{{ job.title }}</h4>
+        <p>{{ job.created_at | timesince }} 发布</p>
+          {% if job.salary_min == 0 and job.salary_max ==0 %}
+          <b>面议</b>
+          {% else %}
+          <b>
+            {% if job.salary_min >= 1000 %}
+                {{ (job.salary_min//1000) }}K
+            {% else %}
+                {{ job.salary_min }}
+            {% endif %}
+            {% if job.salary_max >= 1000 %}
+                {% if (job.salary_max//1000) == (job.salary_min//1000) %}
+                    {{ (job.salary_max//1000) + 1 }}K
+                {% else %}
+                {{ (job.salary_max//1000) }}K
+                {% endif %}
+            {% else %}
+                {{ job.salary_max }}
+            {% endif %}
+          {% endif %}
+          </b>
+        <p>{{ job.exp_req_list[job.exp_required] }} / {{ job.edu_req_list[job.edu_required] }} /
+        {% if job.is_full_time ==True %}
+            全职
+        {% else %}
+            兼职
+        {% endif %}
+        </p>
+        <p><b>{{ job.user.company_info.name }}</b></p>
+        <p><a href="{{ job.url }}" class="btn btn-primary" role="button">查看</a>
+            <!-- <a href="#" class="btn btn-default" role="button">关注</a> -->
+        </p>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
 {% macro render_pagination(pagination, endpoint) %}
 <nav class="nav-pagination" aria-label="Page navigation">
-  <ul class="pagination">
-    <li {% if not pagination.has_prev %} class="disabled"{% endif %}>
-      <a href="{{ url_for(endpoint, page=pagination.prev_num) if pagination.has_prev else '#' }}">&laquo;</a>
-    </li>
-    {% for page in pagination.iter_pages() %}
-      {% if page %}
-        {% if page != pagination.page %}
-        <li><a href="{{ url_for(endpoint, page=page) }}"></a></li>
-        {% else %}
-        <li class="active"><a href="#">{{ page }} <span class="sr-only">(current)</span></a></li>
-        {% endif %}
+  <ul class=pagination>
+  <li{% if not pagination.has_prev %} class="disabled"{% endif %}><a href="{{url_for(endpoint, page=pagination.prev_num) if pagination.has_prev else '#'}}">&laquo;</a></li>
+  {% for page in pagination.iter_pages() %}
+    {% if page %}
+      {% if page != pagination.page %}
+      <li><a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a></li>
       {% else %}
-        <span class=ellipsis>...</span>
+      <li class="active"><a href="#">{{page}} <span class="sr-only">(current)</span></a></li>
       {% endif %}
-    {% endfor %}
-    <li{% if not pagination.hax_next %} class="disabled"{% endif %}><a href="{{ url_for(endpoint, page=pagination.next_num) if pagination.has_next else '#' }}">&raquo;</a></li>
+    {% else %}
+      <span class=ellipsis>…</span>
+    {% endif %}
+  {% endfor %}
+  <li{% if not pagination.has_next %} class="disabled"{% endif %}><a href="{{url_for(endpoint, page=pagination.next_num) if pagination.has_next else '#'}}">&raquo;</a></li>
   </ul>
 </nav>
 {% endmacro %}

@@ -319,9 +319,7 @@ class Job(Base):
 
     @property
     def url(self):
-        # TODO 跳转到职位详情页
-        pass
-        # return url_for('job.detail', course=self.id)
+        return url_for('job.detail', job_id=self.id)
 
     def update_statics(self):
         self.resume_number = len(self.resumes)
