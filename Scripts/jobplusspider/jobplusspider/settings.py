@@ -69,9 +69,6 @@ ITEM_PIPELINES = {
     # 'scrapy.pipelines.images.ImagesPipeline': 150,
 }
 
-IMAGES_STROE = 'images'
-IMAGES_THUMBS = {'small':(100, 100)}
-
 DEFAULT_REQUEST_HEADERS = {
     "accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
     "accept-encoding":"gzip, deflate, br",
