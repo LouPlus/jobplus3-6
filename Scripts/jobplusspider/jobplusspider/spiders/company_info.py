@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
+import copy
 from jobplusspider.items import CompanyItem
 
 class CompanyInfoSpider(scrapy.Spider):
@@ -14,18 +15,18 @@ class CompanyInfoSpider(scrapy.Spider):
     def parse(self, response):
         item = CompanyItem()
         for company in response.css('div.company-list div.row'):
-            item['name'] = company.css('h4.media-heading a::text').extract_first()
-            item['web_url'] = company.css('a.company-site::attr(href)').extract_first()
+            item['name'] = company.xpath('.//h4[@class="media-heading"]/a/text()').extract_first()
+            item['web_url'] = company.xpath('.//a[@class="company-site"]/@href').extract_first()
             item['slogan'] = company.css('p.company-desc::text').extract_first(default='像我这样的企业是没有Slogan的')
             item['city'] = company.xpath('.//li[@class="text-muted "]/span/text()').extract_first(default='火星')
             detail_url = response.urljoin(company.css('h4.media-heading a::attr(href)').extract_first())
             request = scrapy.Request(detail_url, callback=self.parse_detail)
-            request.meta['item'] = item
+            request.meta['item'] = copy.deepcopy(item)
             yield request
     
     def parse_detail(self, response):
         item = response.meta['item']
-        item['industry'] = response.css('ul.list-inline li::text').re('\w+\\+?\s?\w+')
+        item['industry'] = response.css('ul.list-inline li::text').re('\w+\\+?-?\s?\w+\s?\w+')
         item['description'] = response.css('div#detailBoard p::text').extract()
         item['image_urls'] = response.css('div.img-warp img::attr(src)').extract_first()
         yield item

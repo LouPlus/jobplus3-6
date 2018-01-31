@@ -66,17 +66,14 @@ ROBOTSTXT_OBEY = True
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'jobplusspider.pipelines.JobplusspiderPipeline': 300,
-    'scrapy.pipelines.images.ImagesPipeline': 150,
+    # 'scrapy.pipelines.images.ImagesPipeline': 150,
 }
-IMAGES_STROE = 'images'
-IMAGES_THUMBS = {'small':(100, 100)}
 
 DEFAULT_REQUEST_HEADERS = {
     "accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
     "accept-encoding":"gzip, deflate, br",
     "accept-language":"zh-CN,zh;q=0.9",
     "cache-control":"max-age=0",
-    "cookie":"_ga=GA1.2.709960244.1515944562;_gid=GA1.2.163836027.1516642517;PHPSESSID=web1~2ejiohe88d96vkp092i92ho7ke; _gat=1; Hm_lvt_e23800c454aa573c0ccb16b52665ac26=1517121746,1517130112,1517134313,1517135527; Hm_lpvt_e23800c454aa573c0ccb16b52665ac26=1517135527",
     "referer":"https://segmentfault.com/jobs",
     "upgrade-insecure-requests":"1",
     "user-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"

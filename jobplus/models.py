@@ -189,12 +189,12 @@ class Company(Base):
     city = db.Column(db.String(32), default='北京', nullable=False)
     address = db.Column(db.String(512), nullable=False)
     scale = db.Column(db.SmallInteger, default=SCALE_15_LESS, nullable=False)
-    industry = db.Column(db.String(32))
+    industry = db.Column(db.String(256))
     email = db.Column(db.String(64), nullable=False)
     phone = db.Column(db.String(16), nullable=False)
     fax = db.Column(db.String(16))
     manager_name = db.Column(db.String(32))
-    manager_job = db.Column(db.String(32))
+    manager_job = db.Column(db.String(128))
     manager_photo = db.Column(db.String(256))
 
     slogan = db.Column(db.String(140))
@@ -209,7 +209,7 @@ class Company(Base):
     total_resume_number = db.Column(db.Integer, default=0)
     # 所有职位的总关注人数
     total_job_followers = db.Column(db.Integer, default=0)
-    view_count = db.Column(db.Integer)
+    view_count = db.Column(db.Integer, default=0)
 
     job = db.relationship('Job')
     follows = db.relationship('User', secondary=Company_follows, backref=db.backref('company_follows'))
