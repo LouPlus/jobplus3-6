@@ -109,7 +109,8 @@ def iter_companies(companies):
             manager_job='CEO',
             slogan=fake_cn.sentence(),
             products_display=fake_cn.text(),
-            description=fake_cn.text()
+            description=fake_cn.text(),
+            web_url='http://baidu.com'
         )
 
 
@@ -135,7 +136,8 @@ def iter_jobs(companies):
                 exp_required=randint(0, 5),
                 edu_required=randint(0, 5),
                 description=fake_cn.text()[:140],
-                work_address=company.company_info.address
+                work_address=company.company_info.address,
+                company_id=company.company_info.id
             )
 
 
@@ -239,6 +241,16 @@ def run(user_num=20, company_num=20, clearing_db=False):
         if clearing_db:
             empty_db()
         print('---测试开始---')
+
+        if not User.query.filter_by(username='admin').first():
+            print('生成admin')
+            admin = User()
+            admin.username = 'admin'
+            admin.password = '123456'
+            admin.role = User.ROLE_ADMIN
+        else:
+            print('Admin 已存在')
+
         print('开始生成用户')
         test_seekers = list(iter_users(user_num, User.ROLE_SEEKER))
         for seeker in test_seekers:

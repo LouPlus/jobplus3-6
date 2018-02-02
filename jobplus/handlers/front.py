@@ -39,17 +39,20 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        login_user(user, form.remember_me.data)
-        flash('欢迎回来，{}'.format(user.username), 'success')
-        if user.role == User.ROLE_ADMIN:
-            # TODO 应该跳转到管理页面
-            return redirect(url_for('.index'))
-        elif user.role == User.ROLE_SEEKER:
-            # TODO 应该跳转到个人配置页面
-            return redirect(url_for('.index'))
-        elif user.role == User.ROLE_COMPANY:
-            # TODO 应该跳转到企业管理页面
-            return redirect(url_for('.index'))
+        if user.status == User.STATUS_NORMAL:
+            login_user(user, form.remember_me.data)
+            flash('欢迎回来，{}'.format(user.username), 'success')
+            if user.role == User.ROLE_ADMIN:
+                # TODO 应该跳转到管理页面
+                return redirect(url_for('.index'))
+            elif user.role == User.ROLE_SEEKER:
+                # TODO 应该跳转到个人配置页面
+                return redirect(url_for('.index'))
+            elif user.role == User.ROLE_COMPANY:
+                # TODO 应该跳转到企业管理页面
+                return redirect(url_for('.index'))
+        else:
+            flash('登录失败，该账号已被停用', 'danger')
     else:
         for field in form:
             if field.errors:

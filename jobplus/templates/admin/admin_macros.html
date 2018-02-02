@@ -1,0 +1,126 @@
+{% macro render_user_list(pagination) %}
+
+<table class="table table-hover">
+    <tr class="active">
+        <th>id</th>
+        <th>用户名</th>
+        <th>类型</th>
+        <th>电话</th>
+        <th>名字</th>
+        <th>状态</th>
+        <th>操作</th>
+    </tr>
+    {% for user in pagination.items %}
+    <tr>
+        <th>{{ user.id }}</th>
+        <th>{{ user.username }}</th>
+        {% if user.is_company %}
+            <th>企业</th>
+            <th>{{ user.company_info.phone }}</th>
+            <th>{{ user.company_info.name }}</th>
+        {% elif user.is_seeker %}
+            <th>求职者</th>
+            <th>{{ user.seeker_info.phone }}</th>
+            <th>{{ user.seeker_info.name }}</th>
+        {% else %}
+            <th>管理员</th>
+            <th>-</th>
+            <th>-</th>
+        {% endif %}
+        <th><a href="{{ url_for('admin.user_list', page=pagination.page, sw_id=user.id)}}">
+            {%- if user.status == user.STATUS_NORMAL -%}
+            <button type="button" class="btn btn-success btn-sm">正常</button>
+            {%- else -%}
+            <button type="button" class="btn btn-danger btn-sm">封禁</button>
+            {%- endif -%}</a></th>
+        <th><a href="{{ url_for('admin.edit_user', user_id=user.id)}}"><button type="button" class="btn btn-info btn-sm">修改</button></a></th>
+    </tr>
+    {% endfor %}
+  </table>
+
+{% endmacro %}
+
+{% macro render_left_sidebar(action) %}
+    <ul class="nav nav-pills nav-stacked">
+        <li><a href="{{ url_for('admin.user_list') }}" class="list-group-item
+        {% if action in ['USER_LIST', 'EDIT_SEEKER', 'EDIT_COMPANY'] %}active{% endif %}">
+        用户列表
+        </a></li>
+        <li><a href="{{ url_for('admin.add_user', action='ADD_COMPANY') }}" class="list-group-item
+        {% if action == 'ADD_COMPANY'%}active{% endif %}">添加企业</a></li>
+        <li><a href="{{ url_for('admin.add_user', action='ADD_SEEKER') }}" class="list-group-item
+        {% if action == 'ADD_SEEKER'%}active{% endif %}">添加求职者</a></li>
+        <li><a href="{{ url_for('admin.add_user', action='ADD_ADMIN') }}" class="list-group-item
+        {% if action == 'ADD_ADMIN'%}active{% endif %}">添加管理员</a></li>
+    </ul>
+{% endmacro %}
+
+{% macro render_pagination(pagination, endpoint, start_page, end_page) %}
+<nav class="nav-pagination" aria-label="Page navigation">
+    <ul class=pagination>
+    {% if pagination.pages > 1 %}
+        <li><a href="{{ url_for(endpoint, page=1) }}">{{ 1 }}</a></li>
+        {% endif %}
+    <li{% if not pagination.has_prev %} class="disabled"{% endif %}><a href="{{url_for(endpoint, page=pagination.prev_num) if pagination.has_prev else '#'}}">&laquo;</a></li>
+
+    {% for page in range(start_page, end_page + 1) %}
+        {% if page != pagination.page %}{# 如果不是当前页数 #}
+            <li><a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a></li>
+        {% else %}
+            <li class="active"><a href="#">{{ page }} <span class="sr-only">(current)</span></a></li>
+        {% endif %}
+    {% endfor %}
+    <li{% if not pagination.has_next %} class="disabled"{% endif %}><a href="{{url_for(endpoint, page=pagination.next_num) if pagination.has_next else '#'}}">&raquo;</a></li>
+    {% if pagination.pages > 1%}
+        <li><a href="{{ url_for(endpoint, page=pagination.pages) }}">{{ pagination.pages }}</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endmacro %}
+
+{% macro render_form(form, url, render_action) %}
+<form method="POST"  action="{{ url }}" enctype="multipart/form-data">
+  {{ form.csrf_token }}
+    {% if render_action == 'EDIT_SEEKER' or render_action == 'EDIT_COMPANY' %}
+    <h1><span class="label label-default"> id: {{ form.user.id }}</span> {{ form.user.username }}</h1>
+    {% endif %}
+  {% for field in form %}
+    {% if field.type == 'CSRFTokenField' %}
+    {{ '' }}
+    {% elif field.type == 'SubmitField' %}
+    {{ form.submit(class='btn btn-primary', type='submit') }}
+    {% elif field.type == 'BooleanField' %}
+    <div class="checkbox">
+      <label>{{ field() }} {{ field.label.text }}</label>
+    </div>
+    {% elif field.type == 'FileField' %}
+      {{ field.label }} {{ field(class='file form-control',accept="image/png,image/bmp,image/jpeg") }}
+
+    {% elif field.type == 'DateField' %}
+    <div class="form-group">
+      {{ field.label }}
+      <div class='input-group date' id='datetimepicker'>
+        {{ field(class='form-control') }}
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+      </div>
+    </div>
+      {% if field.errors %}
+        {% for error in field.errors %}
+        <span class="help-block">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
+    {% else %}
+    <div class="form-group">
+      {{ field.label }} {{ field(class='form-control') }}
+      {% if field.errors %}
+        {% for error in field.errors %}
+        <span class="help-block">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
+    </div>
+    {% endif %}
+    {% endfor %}
+</form>
+{% endmacro %}

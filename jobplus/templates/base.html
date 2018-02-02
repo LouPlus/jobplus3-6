@@ -39,10 +39,15 @@
                         <li><a href="{{ url_for('seeker.register') }}">用户注册</a></li>
                         <li><a href="{{ url_for('front.login') }}">登录</a></li>
                     {% else %}
+
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ current_user.username }}<span class="caret"></span></a>
                             <ul class="dropdown-menu">
+                                {% if current_user.is_admin %}
+                                <li><a href="{{ url_for('admin.user_list') }}">管理中心</a></li>
+                                {% else %}
                                 <li><a href="{{ url_for('seeker.profile') }}">个人主页</a></li>
+                                {% endif %}
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{{ url_for('front.logout') }}">退出登录</a></li>
                             </ul>
