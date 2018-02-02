@@ -2,15 +2,19 @@
 # encoding: utf-8
 
 import datetime
+import os
 
+from PIL import Image
+from flask import current_app
 from flask_wtf import FlaskForm
-
 from flask_uploads import UploadSet, IMAGES
 from flask_login import current_user
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField, IntegerField, RadioField, SelectField 
-from wtforms.validators import Length, Email, EqualTo, DataRequired, URL, NumberRange
-from jobplus.models import db, User, Seeker, Company, Resume, Job
+from werkzeug.utils import secure_filename
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField, SelectField, DateField
+from wtforms.validators import Length, Email, EqualTo, DataRequired, Regexp, URL
+
+from jobplus.models import db, User, Seeker, Company
 
 
 class LoginForm(FlaskForm):
@@ -58,8 +62,7 @@ class UserinfoForm(FlaskForm):
                                    ('8', '8年'),
                                    ('9', '9年'),
                                    ('10', '10年'),
-                                   ('11', '10年以上'),
-                               ])
+                                   ('11', '10年以上')])
     submit = SubmitField('更新信息')
 
     def update_user(self):
@@ -122,10 +125,10 @@ class SeekerRegisterForm(FlaskForm):
 class CompanyRegisterForm(FlaskForm):
     """ 企业注册页面表单模型 """
 
-    username = StringField('用户名', validators=[DataRequired(), Length(3, 24)])
-    email = StringField('邮箱', validators=[DataRequired(), Email(message='请输入合法的Email地址')])
-    password = PasswordField('密码', validators=[DataRequired(), Length(6, 24)])
-    repeat_password = PasswordField('重复密码', validators=[DataRequired(), EqualTo('password')])
+    username = StringField('企业名称', validators=[DataRequired(message='请输入企业名称'), Length(2, 24, message='用户名长度请在4-24位'), Regexp('^[\u4E00-\u9FA5a-zA-Z0-9_]{4,24}$',message='请使用数字字符和下划线')])
+    email = StringField('邮箱', validators=[DataRequired('请输入邮箱'), Email(message='请输入合法的Email地址')])
+    password = PasswordField('密码', validators=[DataRequired('请输入密码'), Length(6, 24)])
+    repeat_password = PasswordField('重复密码', validators=[DataRequired('请重复输入密码'), EqualTo('password')])
     submit = SubmitField('提交')
 
     def validate_username(self, field):
@@ -155,45 +158,78 @@ photos = UploadSet('photos', IMAGES)
 class CompanyProfileForm(FlaskForm):
     """ 企业详情表单 """
 
-    #TODO 图片上传功能表单BUG修复
-    #logo = FileField('企业LOGO', validators=[FileAllowed(photos, '只能上传图片！'), FileRequired('文件未选择！')])
-    name = StringField('企业名称', validators=[DataRequired(), Length(4, 128)])
-    found_date = StringField('企业创建时间',default=datetime.datetime.now().strftime("%Y-%m-%d"))
-    city = StringField('企业所在城市')
-    address = StringField('企业地址', validators=[Length(8, 128)])
-    scale = SelectField('企业人数',choices=[
-        ('0', '少于15人'), 
-        ('1', '15-50人'), 
-        ('2', '50-150人'), 
-        ('3', '150-500人'), 
-        ('4', '大于500人')
-        ])
-    industry = StringField('所在行业')
-    email = StringField('邮箱', validators=[DataRequired(), Email()])
-    phone = StringField('联系电话', validators=[DataRequired(), Length(5, 32)])
-    fax = StringField('传真')
-    manager_name = StringField('招聘负责人', validators=[DataRequired()])
-    manager_job = StringField('负责人职位')
-    # manager_photo = FileField('负责人头像', validators=[FileAllowed(photos, '只能上传图片'), FileRequired('文件未选择！')])
+    logo = FileField('公司LOGO', validators=[FileAllowed(photos, '只能上传图片文件！'),FileRequired('文件未选择！')])
+    name = StringField('公司名称', validators=[DataRequired(message='请输入公司名称'), Length(2, 128)], 
+                                render_kw={"placeholder":"请输入公司名称"})
+    web_url = StringField('公司网址', validators=[DataRequired(message='请输入公司网址'), Length(5,256), URL],
+                                render_kw={"placeholder":"请输入公司网站地址"})
+    manager_name = StringField('招聘负责人', validators=[DataRequired(message='请输入招聘负责人姓名')], 
+                                render_kw={"placeholder":"请输入招聘负责人"})
+    manager_job = StringField('负责人职位', validators=[DataRequired(message='请输入招聘负责人职位')], 
+                                render_kw={"placeholder":"请输入招聘负责人职位"})
+    manager_img = FileField('招聘负责人头像', validators=[FileAllowed(photos, '只能上传图片')])
+    email = StringField('接收简历邮箱', validators=[DataRequired(message='请输入接收简历的公司邮箱'), Email()])
+    phone = StringField('联系电话',render_kw={"placeholder":"请输入公司联系电话"})
+    fax = StringField('传真', render_kw={"placeholder":"请输入公司传真"})
+    found_date = DateField('公司创建时间', validators=[DataRequired(message='请选择公司注册时间')], default=datetime.datetime.now())
+    city = StringField('公司所在城市', validators=[DataRequired(message='请输入公司所在城市')],
+                                render_kw={"placeholder":"请输入公司所在城市"})
+    address = StringField('公司地址', validators=[Length(8, 128, message='地址字数限制在8-128位')],
+                                render_kw={"placeholder":"请输入公司地址"})
+    scale = SelectField('公司人数', choices=[
+        ('0', '少于15人'),
+        ('1', '15-50人'),
+        ('2', '50-150人'),
+        ('3', '150-500人'),
+        ('4', '大于500人')])
+    industry = StringField('所在行业', render_kw={"placeholder":"通信 互联网 硬件..."})
+    slogan = StringField('Slogan', render_kw={"placeholder":"请输入公司Slogan"})
+    products_display = TextAreaField('公司产品简介', render_kw={"placeholder":"请输入公司产品名称"})
+    description = TextAreaField('公司描述', render_kw={"placeholder":"请输入公司描述信息"})
     submit = SubmitField('提交')
 
     def validate_name(self, field):
         company_name = Company.query.filter_by(name=field.data).first()
         if company_name:
-            raise ValidationError('企业已存在')
+            raise ValidationError('公司已存在')
 
-    def add_company_profile(self, user_id):
-        company = Company()
+    def change_img(self, field_data, user_id):
+        """将用户上传的图片压缩为 100*100 比例进行存储
+        Args：
+            field_data (filed.data): 图片表单数据
+            user_id (int) : 用户ID
+        """
+        if field_data is None:
+            filename = 'avatar_default.jpg'
+            return filename
+
+        filename = str(user_id) + '_' + secure_filename(field_data.filename)
+        size = (100, 100) 
+        img_path = current_app.config['UPLOADED_PHOTOS_DEST']
+
+        im = Image.open(field_data)
+        im.thumbnail(size)
+        im.save(os.path.join(img_path, filename))
+        return filename
+
+    def add_company_profile(self, user_id, username):
+        """添加企业用户信息到 Company 数据库表
+        Args：
+            user_id (int) : 注册用户ID
+        """
         
-        #TODO 图片上传功能BUG修复
-        #logo = photos.save(self.logo.data)
-        #photo = photos.save(self.manager_photo.data)
-        # photo_path = photo.path(photo)
-        # logo_path = companyimg.path(logo)
+        company = Company()
+
+        logo = self.logo.data
+        manager_img = self.manager_img.data
+
+        logo_filename = self.change_img(logo, user_id)
+        manager_img_filename = self.change_img(manager_img, user_id)
 
         company.user_id = user_id
-        company.name = self.name.data
-        # company.logo = logo
+        company.name = username
+        company.logo = logo_filename
+        company.web_url = self.web_url.data
         company.found_date = self.found_date.data
         company.city = self.city.data
         company.address = self.address.data
@@ -204,6 +240,9 @@ class CompanyProfileForm(FlaskForm):
         company.fax = self.fax.data
         company.manager_name = self.manager_name.data
         company.manager_job = self.manager_job.data
-        # company.manager_photo = photo
+        company.manager_photo = manager_img_filename
+        company.slogan = self.slogan.data
+        company.products_display = self.products_display.data
+        company.description = self.description.data
         db.session.add(company)
         db.session.commit()

@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+import os
+
 
 class BaseConfig(object):
     SECRET_KEY = 'makesure to set a very secret key'
     INDEX_PER_PAGE = 10
+    LIST_PER_PAGE = 15
 
 
 class DevelopmentConfig(BaseConfig):
@@ -12,7 +15,8 @@ class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root@localhost:3306/jobplus?charset=utf8'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TEMPLATES_AUTO_RELOAD = True
-    UPLOADED_PHOTOS_DEST = '/static/company_img'
+    # 企业相关图片文件路径
+    UPLOADED_PHOTOS_DEST = os.getcwd() + '/jobplus/static/company_img'
 
 
 class ProductionConfig(BaseConfig):

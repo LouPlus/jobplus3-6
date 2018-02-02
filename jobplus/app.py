@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
+import datetime
+import re
 
 from flask import Flask
 from flask_migrate import Migrate
@@ -10,8 +12,6 @@ from flask_uploads import configure_uploads, patch_request_class
 from jobplus.config import configs
 from jobplus.models import db, User
 from jobplus.forms import photos
-
-import datetime
 
 
 def register_filters(app):
@@ -31,6 +31,36 @@ def register_filters(app):
         if delta.seconds > 60:
             return '{}分钟前'.format(delta.seconds // 60)
         return '刚刚'
+    
+    @app.template_filter()
+    def date_format(found_date):
+        date = datetime.datetime.strftime(found_date, '%Y')
+        return date
+    
+    @app.template_filter()
+    def scale_format(scale):
+        if scale == 0:
+            return '1-15名雇员'
+        elif scale == 1:
+            return '15-50名雇员'
+        elif scale == 2:
+            return '50-150名雇员'
+        elif scale == 3:
+            return '150-500名雇员'
+        else:
+            return '500+雇员'
+    
+    @app.template_filter()
+    def sentence_split(sentence):
+        return re.split(r",|\.|;|，|；|、|\s|/|\\", sentence)
+
+    @app.template_filter()
+    def ex_link(url):
+        url = str(url)
+        if 'http://' in url or 'https' in url:
+            return url
+        else:
+            return "http://" + str(url)
 
 
 def register_blueprints(app):
