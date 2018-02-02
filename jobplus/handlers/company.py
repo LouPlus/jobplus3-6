@@ -9,6 +9,7 @@ from flask_login import login_user, current_user, login_required
 from jobplus.models import User, Company, db
 from jobplus.forms import CompanyRegisterForm, CompanyProfileForm
 from jobplus.decorators import company_required
+from .job import job
 
 
 company = Blueprint('company', __name__, url_prefix='/company')
@@ -62,7 +63,6 @@ def company_detail(company_id):
     db.session.add(company)
     db.session.commit()
     return render_template('company/detail.html', company_obj=company)
-
 
 @company.route('/follow/<int:company_id>')
 @login_required
