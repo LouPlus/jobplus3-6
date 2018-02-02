@@ -211,7 +211,7 @@ class Company(Base):
     total_job_followers = db.Column(db.Integer, default=0)
     view_count = db.Column(db.Integer, default=0)
 
-    job = db.relationship('Job')
+    jobs = db.relationship('Job')
     follows = db.relationship('User', secondary=Company_follows, backref=db.backref('company_follows'))
 
     def __repr__(self):
@@ -282,9 +282,10 @@ class Job(Base):
     EDU_OTHER = 5
     edu_req_list = ['不限', '专科', '本科', '硕士', '博士', '其他']
 
-    # 职位状态，“正在招聘” 和 “招聘结束”
+    # 职位状态，“正在招聘” “招聘结束”及”已被删除”
     STATUS_OPENED = 0
     STATUS_CLOSED = -1
+    STATUS_DELETE = 1
 
     # 经验要求
     EXP_REQ_NO_LIMIT = 0

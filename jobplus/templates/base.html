@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+{% set active_page = active_page | default('index') %}
+{% set navigation_left_bar = [
+    ('/', 'index', '首页'),
+    (url_for('job.list'), 'job', '职位'),
+    (url_for('company.company_list'), 'company', '公司')
+    ] %}
+
 <html lang="zh-CN">
     <head>
         <meta charset="utf-8">
@@ -28,9 +35,12 @@
                 <!-- collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-colapse-1">
                     <ul class="nav navbar-nav" style="margin-left: 50px;" >
-                        <li class="active"><a href="/">首页<span class="sr-only"></span></a></li>
-                        <li><a href="{{ url_for('job.list') }}">职位</a></li>
-                        <li><a href="{{ url_for('company.company_list') }}">公司</a></li>
+                        {% for href, id, caption in navigation_left_bar %}
+                        <li{% if id == active_page %} class="active" {% endif %}>
+                            <a href="{{ href }}">
+                            <span {% if id == active_page %}class="text-primary"{% endif %}>{{ caption|e }}</span>
+                        </a></li>
+                        {% endfor %}
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
 
@@ -39,7 +49,9 @@
                         <li><a href="{{ url_for('seeker.register') }}">用户注册</a></li>
                         <li><a href="{{ url_for('front.login') }}">登录</a></li>
                     {% else %}
-
+                         {% if current_user.role == current_user.ROLE_COMPANY %}
+                        <li><a href="{{ url_for('company.job_admin')}}">管理</a></li>
+                        {% endif %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ current_user.username }}<span class="caret"></span></a>
                             <ul class="dropdown-menu">
@@ -49,13 +61,11 @@
                                 <li><a href="{{ url_for('seeker.profile') }}">个人主页</a></li>
                                 {% endif %}
                                 <li role="separator" class="divider"></li>
-                                <li><a href="{{ url_for('front.logout') }}">退出登录</a></li>
+                                <li><a href="{{ url_for('front.logout') }}" class="text-center">退出登录</a></li>
                             </ul>
                         </li>
                     {% endif %}
                     </ul>
-
-
                 </div>
             </div>
         </nav>
