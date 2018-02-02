@@ -49,8 +49,8 @@
                         <li><a href="{{ url_for('seeker.register') }}">用户注册</a></li>
                         <li><a href="{{ url_for('front.login') }}">登录</a></li>
                     {% else %}
-                        {% if current_user.role == current_user.ROLE_COMPANY %}
-                        <li><a href="{{ url_for('company.job_admin')}}">管理</a></li>
+                        {% if current_user.is_company %}
+                        <li><a href="{{ url_for('company.job_admin') }}">管理</a></li>
                         {% endif %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ current_user.username }}<span class="caret"></span></a>
