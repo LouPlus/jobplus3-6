@@ -85,6 +85,8 @@ def register_extensions(app):
         return User.query.get(id)
 
     login_manager.login_view = 'front.login'
+    login_manager.login_message = '请登录后操作！'
+    login_manager.login_message_category = "danger"
 
 
 def create_app(config):

@@ -12,8 +12,8 @@
                 <div class="media">
                     <div class="media-left">
                     <img src="{{ company_obj.get_img('logo') }}" class="media-object img-thumbnail company-img">
-                </div>
-                <div class="media-body media-right">
+                    </div>
+                    <div class="media-body media-right">
                     <h3 class="media-heading">{{ company_obj.name }}</h3>
                     <p><a class="company-site" target="_blank" rel="nofollow" href="{{ company_obj.web_url | ex_link }}">{{ company_obj.web_url }}</a></p>
                     <p>{{ company_obj.slogan }}</p>
@@ -21,7 +21,7 @@
                     {% for industry in industry_list %}
                     <span class="label label-primary">{{ industry }}</span>
                     {% endfor %}
-                </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-3 hidden-xs">
