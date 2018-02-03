@@ -1,0 +1,10 @@
+{% extends "admin/admin_base.html" %}
+{% from "admin/admin_macros.html" import render_form %}
+
+{% block main_content %}
+{% if action == 'EDIT_SEEKER' or action == 'EDIT_COMPANY' %}
+    {{ render_form(form, url_for('admin.edit_user', action=action, user_id=user_id), render_action=action) }}
+{% elif action == 'ADD_SEEKER' or action == 'ADD_COMPANY' %}
+    {{ render_form(form, url_for('admin.add_user', render_action=action)) }}
+{% endif %}
+{% endblock %}
