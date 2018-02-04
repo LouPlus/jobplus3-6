@@ -77,4 +77,3 @@ def run():
     except Exception as e:
         print(e)
         db.session.rollback()
-
