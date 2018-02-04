@@ -1,34 +1,10 @@
 {% extends "company/admin/index.html" %}
-{% from "macros.html" import render_pagination %}
+{% from "macros.html" import render_pagination, render_company_jobs_admin %}
+{% set active_page='jobs' %}
 
 {% block title %}职位管理 - Jobplus{% endblock %}
 
 {% block admin %}
-<div class="panel panel-default">
-    <div class="panel-heading"><h4 class="text-center">所有职位</h4></div>
-    <table class="table table-hover table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>职位名称</th>
-                <th>发布时间</th>
-                <th>状态</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for job in pagination.items %}
-            <tr>
-                <th scope="row">{{ loop.index + (pagination.page - 1)*pagination.per_page }}</th>
-                <th>{{ job.title  }}</th>
-                <th>{{ job.created_at }}</th>
-                <th>{{ job.status }}</th>
-                <th></th>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
+{{ render_company_jobs_admin(pagination) }}
 {{ render_pagination(pagination, 'company.job_admin') }}
 {% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% from "macros.html" import render_form %}
+
+{% block title %}新增职位 - Jobplus{% endblock %}
+
+{% block body %}
+<div class="form">
+    <h2>新增职位</h2>
+    {{ render_form(form, url_for('company.add_job')) }}
+</div>
+
+{% endblock %}

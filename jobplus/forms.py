@@ -11,10 +11,10 @@ from flask_uploads import UploadSet, IMAGES
 from flask_login import current_user
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from werkzeug.utils import secure_filename
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField, SelectField, DateField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField, SelectField, DateField, IntegerField
 from wtforms.validators import Length, Email, EqualTo, DataRequired, Regexp, URL
 
-from jobplus.models import db, User, Seeker, Company
+from jobplus.models import db, User, Seeker, Company, Job
 
 
 class LoginForm(FlaskForm):
@@ -246,3 +246,73 @@ class CompanyProfileForm(FlaskForm):
         company.description = self.description.data
         db.session.add(company)
         db.session.commit()
+
+
+class JobForm(FlaskForm):
+    title = StringField('职位名称', validators=[DataRequired(message='请输入职位名称'), Length(2, 64)], render_kw={"placeholder":"请输入职位名称"})
+    salary_min = IntegerField('最低薪资', default=0, render_kw={"placeholder":"不输入最低及最高薪资则为面议"})
+    salary_max = IntegerField('最高薪资', default=0, render_kw={"placeholder":"不输入最低及最高薪资则为面议"})
+    exp_required = SelectField('经验要求', choices=[
+        ('0', '不要求'),
+        ('1', '应届毕业生'),
+        ('2', '3年及以下'),
+        ('3', '3-5年'),
+        ('4', '5-10年'),
+        ('5', '10年以上')
+    ], default=0, render_kw={"placeholder":"工作经验要求"})
+    edu_required = SelectField('学历要求', choices=[
+        ('0', '不限'),
+        ('1', '专科'),
+        ('2', '本科'),
+        ('3', '硕士'),
+        ('4', '博士'),
+        ('5', '其他')
+    ], default=0, render_kw={"placeholder":"学历要求"})
+    is_full_time = SelectField('职位性质', choices=[
+        ('0', '兼职'),
+        ('1', '全职')
+    ], default=1, render_kw={"placeholder":"请选择工作性质"})
+    description = TextAreaField('职位介绍',  render_kw={"placeholder":"请输入公司描述信息"})
+    work_address = StringField('工作地址', validators=[DataRequired()], render_kw={"placeholder":"请输入工作地址"})
+    status = SelectField('是否立即上线', choices=[
+        ('0', '立即上线'),
+        ('-1', '暂不上线')])
+    submit = SubmitField('提交')
+
+    def new_job(self, user_id, company_id):
+        """ 创建新职位，必须为企业用户
+        Args:
+            user_id (int): 企业用户id
+            company_id (int): 企业用户详情id
+        """
+        if self.is_full_time.data == '0':
+            is_full_time = False
+        else:
+            is_full_time = True
+
+        job = Job()
+        job.title = self.title.data
+        job.status = self.status.data
+        job.user_id = user_id
+        job.salary_min = self.salary_min.data
+        job.salary_max = self.salary_max.data
+        job.exp_required = self.exp_required.data
+        job.edu_required = self.edu_required.data
+        job.is_full_time = is_full_time
+        job.description = self.description.data
+        job.work_address = self.work_address.data
+        job.company_id = company_id
+        db.session.add(job)
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+
+        def update_job(self, job):
+            self.populate_obj(job)
+            db.session.add(job)
+            db.session.commit()
+
+
+    
+    

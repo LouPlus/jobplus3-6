@@ -168,3 +168,47 @@
   </ul>
 </nav>
 {% endmacro %}
+
+{% macro render_company_jobs_admin(pagination) %}
+<div class="panel panel-default">
+    <div class="panel-heading" ><h4 class="text-center" style="color:#b63b4d">所有职位</h4></div>
+    <table class="table table-hover table-striped ">
+        <thead>
+            <tr class='block-center'>
+                <th class="text-center">ID</th>
+                <th class="text-center">职位名称</th>
+                <th class="text-center">发布时间</th>
+                <th class="text-center">状态</th>
+                <th class="text-center">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in pagination.items %}
+            <tr>
+                <th scope="row" class="text-center">{{ loop.index + (pagination.page - 1)*pagination.per_page }}</th>
+                <th class="text-center"><a href="{{ url_for('job.detail',job_id=job.id) }}" style="color:black;">{{ job.title  }}</a></th>
+                <th class="text-center">{{ job.created_at |timesince}}</th>
+                <th class="text-center">{{ '正在招聘' if job.status==job.STATUS_OPENED else '已停止招聘'}}</th>
+                <th class="text-center">
+                    <a role="button" class="btn btn-success btn-xs" href="#">
+                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 编辑
+                    </a>
+                    {% if job.status==job.STATUS_OPENED %}
+                    <a role="button" class="btn btn-danger btn-xs" href="{{ url_for('company.job_status', job_id=job.id) }}">
+                      <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span> 下线
+                    </a>
+                    {% else %}
+                    <a role="button" class="btn btn-info btn-xs" href="{{ url_for('company.job_status', job_id=job.id) }}">
+                      <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 上线
+                    </a>
+                    {% endif %}
+                    <a role="button" class="btn btn-primary btn-xs" href="{{ url_for('company.delete_job',job_id=job.id) }}">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 移除
+                    </a>
+                </th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
