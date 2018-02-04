@@ -80,7 +80,12 @@ def follow(company_id):
 @company_required
 def job_admin():
     page = request.args.get('page', default=1, type=int)
-    pagination = Job.query.filter_by(company_id=current_user.id).paginate(
+    id = request.args.get('id', default=1, type=int)
+    filters = {
+        Job.company_id == current_user.company_info.id,
+        Job.status != Job.STATUS_DELETE
+    }
+    pagination = Job.query.filter(*filters).order_by(Job.updated_at.desc()).paginate(
         page=page,
         per_page=current_app.config['LIST_PER_PAGE'],
         error_out=False

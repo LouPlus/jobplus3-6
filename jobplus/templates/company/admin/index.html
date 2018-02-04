@@ -12,14 +12,14 @@
             <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="100%" color=#987cb9 SIZE=3>
             <ul id="accordion" class="accordion nav nav-pills nav-stacked">
                 <li>
-                    <div class="link"><i class="glyphicon glyphicon-th-list"></i><span>职位管理</span><i class="glyphicon glyphicon-triangle-bottom"></i></div>
+                    <div class="link"><i class="glyphicon glyphicon-th-list"></i>职位管理<i class="glyphicon glyphicon-triangle-bottom"></i></div>
                     <div class="submenu">
-                        <span><a href="#">所有职位</a></span>
-                        <span><a href="#">在招职位</a></span>
-                        <span><a href="#">已下线职位</a></span>
+                        <span><a href="{{ url_for('company.job_admin') }}">所有职位<span class="badge">{{ current_user.company_info.jobs | count }}</span></a></span>
+                        <span><a href="#">在招职位<span class="badge">{{ current_user.company_info.jobs | count }}</span></a></span>
+                        <span><a href="#">已下线职位<span class="badge">{{ current_user.company_info.jobs | count }}</span></a></span>
                     </div>
                 </li>
-                <li><div class="link"><i class="glyphicon glyphicon-file"></i><span>简历管理</span><i class="glyphicon glyphicon-triangle-bottom"></i></div>
+                <li><div class="link"><i class="glyphicon glyphicon-file"></i>简历管理<i class="glyphicon glyphicon-triangle-bottom"></i></div>
                     <div class="submenu">
                         <span><a href="#">未处理</a></span>
                         <span><a href="#">不合适</a></span>
@@ -29,7 +29,6 @@
             </ul>
             {% block operation %}{% endblock %}
         </div>
-        <table border="1px" cellpadding="0" cellspacing="0" style="height:265px;border-left-style:solid; border-bottom-style:none;border-right-style:none;border-top-style:none"></table>
         <div class="col-md-9 col-sm-9">
             {% block admin %}{% endblock %}
         </div>
