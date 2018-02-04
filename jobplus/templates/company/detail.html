@@ -1,7 +1,10 @@
 {% extends "base.html" %}
+{% set active_page = 'company' %}
 {% set job = company_obj.new_job %}
 {% set industry_list = company_obj.industry | sentence_split %}
 {% set products = company_obj.products_display | sentence_split %}
+
+{% block title %}企业详情 - Jobplus{% endblock %}
 
 {% block body %}
 <br>
@@ -80,11 +83,13 @@
                                     <h3 class="panel-title text-center">最新招聘职位</h3>
                                 </div>
                                 <div class="panel-body">
-                                    <a href="#"><h3>{{ job.title }}</h3></a>
-                                    <p><span>{{ job.salary_min }}-{{ job.salary_max }}</span>
-                                    <span>经验{{ job.exp_required }}</span>
-                                    <span>{{ job.edu_required }}</span>
-                                    <span>{{ job.is_full_time }}</span>
+                                    <a href="{{ url_for('job.detail',job_id=job.id) }}"><h3>{{ job.title }}</h3></a>
+                                    <p>
+                                        <span>学历{{ job.edu_req_list[job.edu_required] }}</span>
+                                        <span style="margin-left:4px;">{{ '全职' if job.is_full_time else '兼职' }}</span>
+                                        <br>
+                                        <span style="color:indianred;">{{ job.salary_min }}-{{ job.salary_max }}</span>
+                                        <span style="margin-left:4px;">{{ job.exp_req_list[job.exp_required] }}</span>
                                     </p>
                                     <a href="#">查看全部职位→</a>
                                 </div>

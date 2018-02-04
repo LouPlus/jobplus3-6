@@ -17,16 +17,18 @@
             </tr>
         </thead>
         <tbody>
+            {% for job in pagination.items %}
             <tr>
-                {% for job in pagination.items %}
-                    <th scope="row">{{ job.id }}</th>
-                    <th>{{ job.title  }}</th>
-                    <th>{{ job.created_at }}</th>
-                    <th>{{ job.status }}</th>
-                    <th></th>
-                {% endfor %}
+                <th scope="row">{{ loop.index + (pagination.page - 1)*pagination.per_page }}</th>
+                <th>{{ job.title  }}</th>
+                <th>{{ job.created_at }}</th>
+                <th>{{ job.status }}</th>
+                <th></th>
             </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
+
+{{ render_pagination(pagination, 'company.job_admin') }}
 {% endblock %}

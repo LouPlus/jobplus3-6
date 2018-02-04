@@ -211,7 +211,7 @@ class Company(Base):
     total_job_followers = db.Column(db.Integer, default=0)
     view_count = db.Column(db.Integer, default=0)
 
-    jobs = db.relationship('Job')
+    jobs = db.relationship('Job', backref='company')
     follows = db.relationship('User', secondary=Company_follows, backref=db.backref('company_follows'))
 
     def __repr__(self):
@@ -237,8 +237,9 @@ class Company(Base):
     
     @property
     def new_job(self):
-        # return self.job.query.order_by(db.desc(self.job.id)).first()
-        return Job.query.first()
+        newest_job = Job.query.filter_by(company_id=self.id).\
+        order_by(Job.updated_at.desc()).first()
+        return newest_job
 
     def get_img(self, img):
         if img == 'logo':
