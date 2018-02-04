@@ -17,7 +17,7 @@
         {% if user.is_company %}
             <th>企业</th>
             <th>{{ user.company_info.phone }}</th>
-            <th>{{ user.company_info.name }}</th>
+            <th>{{ user.company_info.name | long_string_cutter(12) }}</th>
         {% elif user.is_seeker %}
             <th>求职者</th>
             <th>{{ user.seeker_info.phone }}</th>
@@ -53,8 +53,8 @@
     {% for job in pagination.items %}
     <tr>
         <th>{{ job.id }}</th>
-        <th><a href="{{ url_for('job.detail', job_id=job.id)}}">{{ job.title }}</a></th>
-        <th><a href="{{ url_for('company.company_detail', company_id=job.company_id) }}">{{ job.user.company_info.name }}</a></th>
+        <th><a href="{{ url_for('job.detail', job_id=job.id)}}">{{ job.title  | long_string_cutter(12)}}</a></th>
+        <th><a href="{{ url_for('company.company_detail', company_id=job.company_id) }}">{{ job.user.company_info.name | long_string_cutter(12)}}</a></th>
         <th>{{ job.created_at }}</th>
 
         <th>
@@ -111,16 +111,23 @@
 {% endmacro %}
 
 {% macro render_form(form, url, render_action) %}
+    {% if render_action == 'EDIT_SEEKER' or render_action == 'EDIT_COMPANY' %}
+    <div class="form-group">
+    <label>id:</label>
+    <input class="form-control" name="id" disabled="disabled" value="{{ form.user.id }}" type="text">
+    </div>
+    <div class="form-group">
+    <label>用户名:</label>
+    <input class="form-control" name="id" disabled="disabled" value="{{ form.user.username }}" type="text">
+    </div>
+    {% endif %}
 <form method="POST"  action="{{ url }}" enctype="multipart/form-data">
   {{ form.csrf_token }}
-    {% if render_action == 'EDIT_SEEKER' or render_action == 'EDIT_COMPANY' %}
-    <h1><span class="label label-default"> id: {{ form.user.id }}</span> {{ form.user.username }}</h1>
-    {% endif %}
   {% for field in form %}
     {% if field.type == 'CSRFTokenField' %}
     {{ '' }}
     {% elif field.type == 'SubmitField' %}
-    {{ form.submit(class='btn btn-primary', type='submit') }}
+    <div class="form-group panel_summit_btn">{{ form.submit(class='btn btn-primary', type='submit') }}</div>
     {% elif field.type == 'BooleanField' %}
     <div class="checkbox">
       <label>{{ field() }} {{ field.label.text }}</label>
