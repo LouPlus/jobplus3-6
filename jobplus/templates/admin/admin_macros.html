@@ -40,18 +40,50 @@
 
 {% endmacro %}
 
+{% macro render_job_list(pagination) %}
+<table class="table table-hover">
+    <tr class="active">
+        <th>id</th>
+        <th>名称</th>
+        <th>企业</th>
+        <th>发布时间</th>
+        <th>状态</th>
+
+    </tr>
+    {% for job in pagination.items %}
+    <tr>
+        <th>{{ job.id }}</th>
+        <th><a href="{{ url_for('job.detail', job_id=job.id)}}">{{ job.title }}</a></th>
+        <th><a href="{{ url_for('company.company_detail', company_id=job.company_id) }}">{{ job.user.company_info.name }}</a></th>
+        <th>{{ job.created_at }}</th>
+
+        <th>
+            {%- if job.status == job.STATUS_OPENED -%}
+            <a href="{{ url_for('job.disable', job_id=job.id, next=url_for('admin.job_list', page=pagination.page))}}">
+            <button type="button" class="btn btn-success btn-sm">正常招聘</button></a>
+            {%- else -%}
+            <a href="{{ url_for('job.enable', job_id=job.id, next=url_for('admin.job_list', page=pagination.page))}}">
+            <button type="button" class="btn btn-danger btn-sm">招聘结束</button></a>
+            {%- endif -%}</th>
+    </tr>
+    {% endfor %}
+  </table>
+{% endmacro %}
+
+
 {% macro render_left_sidebar(action) %}
     <ul class="nav nav-pills nav-stacked">
         <li><a href="{{ url_for('admin.user_list') }}" class="list-group-item
         {% if action in ['USER_LIST', 'EDIT_SEEKER', 'EDIT_COMPANY'] %}active{% endif %}">
-        用户列表
-        </a></li>
+        用户列表</a></li>
+        <li><a href="{{ url_for('admin.job_list') }}" class="list-group-item
+       {% if action == 'JOB_LIST'%}active{% endif %}">职位列表</a></li>
         <li><a href="{{ url_for('admin.add_user', action='ADD_COMPANY') }}" class="list-group-item
         {% if action == 'ADD_COMPANY'%}active{% endif %}">添加企业</a></li>
         <li><a href="{{ url_for('admin.add_user', action='ADD_SEEKER') }}" class="list-group-item
         {% if action == 'ADD_SEEKER'%}active{% endif %}">添加求职者</a></li>
-        <li><a href="{{ url_for('admin.add_user', action='ADD_ADMIN') }}" class="list-group-item
-        {% if action == 'ADD_ADMIN'%}active{% endif %}">添加管理员</a></li>
+        {# <li><a href="{{ url_for('admin.add_user', action='ADD_ADMIN') }}" class="list-group-item
+        {% if action == 'ADD_ADMIN'%}active{% endif %}">添加管理员</a></li> #}
     </ul>
 {% endmacro %}
 

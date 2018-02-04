@@ -29,3 +29,23 @@ def role_required(role_type):
 seeker_required = role_required(User.ROLE_SEEKER)
 company_required = role_required(User.ROLE_COMPANY)
 admin_required = role_required(User.ROLE_ADMIN)
+
+
+def roles_required(*roles):
+    """
+    支持多个用户角色判断
+    :param roles: User.ROLE_XX
+    :return: roles_required 装饰器
+
+        @roles_required(User.ROLE_COMPANY, User.ROLE_ADMIN)
+        foo(*args, **kwargs)
+            pass
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if not current_user.is_authenticated or current_user.role not in roles:
+                abort(404)
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator

@@ -3,20 +3,17 @@
 
 
 from flask import Blueprint, render_template, flash, url_for, request, current_app, redirect
-
-from jobplus.models import db, User, Seeker, Company
+from jobplus.models import db, User, Seeker, Company, Job
 from jobplus.admin_forms import SeekerEditForm, SeekerCreateForm, CompanyEditForm, CompanyCreateForm
-from flask_login import current_user
+from jobplus.decorators import roles_required
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
 
 # 用户列表
 @admin.route('/users', methods=['GET', 'POST'])
+@roles_required(User.ROLE_ADMIN)
 def user_list():
-    if not current_user.is_admin:
-        return redirect(url_for('front.index'))
-
     page = request.args.get('page', default=1, type=int)
     sw_id = request.args.get('sw_id', default=None, type=int)
 
@@ -44,20 +41,22 @@ def user_list():
         if sw_user:
             if not sw_user.status:
                 sw_user.status = -1
+                flash('已禁用用户{}'.format(sw_user.id), 'warning')
             else:
                 sw_user.status = 0
+                flash('已重新启用用户{}'.format(sw_user.id), 'success')
             db.session.add(sw_user)
             db.session.commit()
         else:
-            flash('找不到用户', 'danger')
+            flash('用户不存在', 'danger')
     return render_template('admin/admin_base.html', pagination=pagination, action='USER_LIST', start_page=start_page, end_page=end_page)
 
 
 # 添加用户
 @admin.route('/users/add', methods=['GET', 'POST'])
+@roles_required(User.ROLE_ADMIN)
 def add_user():
-    if not current_user.is_admin:
-        return redirect(url_for('front.index'))
+
     action = request.args.get('action')
 
     if action == 'ADD_SEEKER':
@@ -76,9 +75,9 @@ def add_user():
 
 # 修改用户信息
 @admin.route('/users/edit', methods=['GET', 'POST'])
+@roles_required(User.ROLE_ADMIN)
 def edit_user():
-    if not current_user.is_admin:
-        return redirect(url_for('front.index'))
+
     user_id = request.args.get('user_id', type=int)
     user = User.query.filter_by(id=user_id).first_or_404()
     if user.is_seeker:
@@ -99,3 +98,32 @@ def edit_user():
         print(user.id, action)
         form.load_user_info()
     return render_template('admin/admin_edit.html', user_id=user.id, form=form, action=action)
+
+
+@admin.route('/jobs/', methods=['GET', 'POST'])
+@roles_required(User.ROLE_ADMIN)
+def job_list():
+
+    page = request.args.get('page', default=1, type=int)
+
+    pagination = Job.query.paginate(
+        page=page,
+        per_page=current_app.config['INDEX_PER_PAGE'],
+        error_out=False
+    )
+
+    if pagination.pages < 7:
+        start_page = 1
+        end_page = pagination.pages
+    else:
+        if pagination.page < 3:
+            start_page = 1
+            end_page = 7
+        elif pagination.pages - pagination.page < 3:
+            start_page = pagination.pages - 7
+            end_page = pagination.pages
+        else:
+            start_page = pagination.page - 3
+            end_page = pagination.page + 3
+
+    return render_template('admin/admin_jobs.html', pagination=pagination, action='JOB_LIST', start_page=start_page, end_page=end_page)
