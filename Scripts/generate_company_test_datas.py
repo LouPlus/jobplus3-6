@@ -3,11 +3,11 @@
 
 import os
 import json
-from random import randint
+from random import randint, choice
 
 from faker import Faker
 
-from jobplus.models import db, User, Company
+from jobplus.models import db, User, Company, Job
 
 
 fake = Faker(locale='zh-cn')
@@ -65,13 +65,39 @@ def iter_companys():
             description = company['description']
             )
 
-def run():
-    for user in iter_users():
-        db.session.add(user)
+def iter_jobs():
+    users = User.query.filter_by(role=30).all()
+    job_title = ['运维工程师','Linux系统开发工程师','测试工程师', '金融产品经理','游戏主美', '前端开发工程师',
+    '数据开发', '售前工程师', '项目经理', '测试工程师','电商运营', '部门助理', '分公司负责人', '质检专员', '监理',
+    '市场推广', '资深视觉设计师', '商务经理', '投资助理', 'web前端']
+    for user in users:
+        job_quantity = 20
+        while job_quantity > 0:
+            yield Job(
+                title = choice(job_title),
+                user_id = user.id,
+                salary_min = choice([1000,2000,3000,4000,5000]),
+                salary_max = choice([6000,7000,8000,9000,10000]),
+                exp_required = randint(0,5),
+                edu_required = randint(0,5),
+                is_full_time = choice([True, False]),
+                description = fake.text(),
+                work_address = fake.address(),
+                company_id = user.company_info.id
+            )
+            job_quantity -= 1
 
-    for company in iter_companys():
-        db.session.add(company)
+
+def run():
+    # for user in iter_users():
+        # db.session.add(user)
+
+    # for company in iter_companys():
+        # db.session.add(company)
     
+    for job in iter_jobs():
+        db.session.add(job)
+
     try:
         db.session.commit()
     except Exception as e:

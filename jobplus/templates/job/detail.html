@@ -70,7 +70,7 @@
           {% if job.user.company_info.logo == None %}
           <img src="{{ url_for('static', filename='img/default_logo.jpg') }}" alt="...">
           {% else %}
-          <img src="/static/company_img/{{ job.user.company_info.logo }}" alt="...">
+          <img src="{{ job.user.company_info.get_img('logo') }}" alt="...">
           {% endif %}
 
           <div class="caption">
