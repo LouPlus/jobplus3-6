@@ -6,7 +6,6 @@ from flask import Blueprint, render_template, flash, url_for, request, current_a
 from jobplus.models import db, User, Seeker, Company, Job
 from jobplus.admin_forms import SeekerEditForm, SeekerCreateForm, CompanyEditForm, CompanyCreateForm
 from jobplus.decorators import roles_required
-from flask_login import current_user
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -106,8 +105,6 @@ def edit_user():
 def job_list():
 
     page = request.args.get('page', default=1, type=int)
-    sw_id = request.args.get('sw_id', default=None, type=int)
-    sw_status = request.args.get('sw_status', default=None, type=int)
 
     pagination = Job.query.paginate(
         page=page,
@@ -129,16 +126,4 @@ def job_list():
             start_page = pagination.page - 3
             end_page = pagination.page + 3
 
-    if sw_id:
-        sw_job = Job.query.filter_by(id=sw_id).first()
-        if sw_job.status != sw_status and sw_status in [Job.STATUS_CLOSED, Job.STATUS_OPENED]:
-            sw_job.status = sw_status
-            db.session.add(sw_job)
-            db.session.commit()
-            if sw_status == Job.STATUS_OPENED:
-                flash('职位{} 开始招聘'.format(sw_job.id), 'success')
-            elif sw_status == Job.STATUS_CLOSED:
-                flash('职位{} 结束招聘'.format(sw_job.id), 'warning')
-        else:
-            flash('职位不存在', 'danger')
     return render_template('admin/admin_jobs.html', pagination=pagination, action='JOB_LIST', start_page=start_page, end_page=end_page)

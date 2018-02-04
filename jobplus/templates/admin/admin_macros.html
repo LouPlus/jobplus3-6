@@ -59,11 +59,9 @@
 
         <th>
             {%- if job.status == job.STATUS_OPENED -%}
-            {# <a href="{{ url_for('admin.job_list', page=pagination.page, sw_id=job.id, sw_status=job.STATUS_CLOSED)}}"> #}
             <a href="{{ url_for('job.disable', job_id=job.id, next=url_for('admin.job_list', page=pagination.page))}}">
             <button type="button" class="btn btn-success btn-sm">正常招聘</button></a>
             {%- else -%}
-            {# <a href="{{ url_for('admin.job_list', page=pagination.page, sw_id=job.id, sw_status=job.STATUS_OPENED)}}"> #}
             <a href="{{ url_for('job.enable', job_id=job.id, next=url_for('admin.job_list', page=pagination.page))}}">
             <button type="button" class="btn btn-danger btn-sm">招聘结束</button></a>
             {%- endif -%}</th>

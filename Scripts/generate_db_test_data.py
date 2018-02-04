@@ -49,13 +49,13 @@ def iter_users(num, role):
                     User.query.filter_by(username=username).first() is None:
                 break
 
-        # print('Creating user: {}'.format(username))
-        yield User(
-            username=username,
-            email=email,
-            password='123456',
-            role=role
-        )
+        # print('Creating user: {} {}'.format(username, email))
+        user = User()
+        user.username = username
+        user.email = email
+        user.password = '123456'
+        user.role = role
+        yield user
 
 
 def iter_seekers(seekers):
@@ -247,7 +247,10 @@ def run(user_num=20, company_num=20, clearing_db=False):
             admin = User()
             admin.username = 'admin'
             admin.password = '123456'
+            admin.email = 'admin@jobplus.com'
             admin.role = User.ROLE_ADMIN
+            db.session.add(admin)
+            db.session.commit()
         else:
             print('Admin 已存在')
 
