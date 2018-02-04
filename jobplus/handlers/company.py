@@ -7,7 +7,7 @@ url_for, current_app, request
 from flask_login import login_user, current_user, login_required
 
 from jobplus.models import User, Company, db, Job
-from jobplus.forms import CompanyRegisterForm, CompanyProfileForm
+from jobplus.forms import CompanyRegisterForm, CompanyProfileForm, JobForm
 from jobplus.decorators import company_required
 
 
@@ -116,3 +116,24 @@ def delete_job(job_id):
     db.session.add(job)
     db.session.commit()
     return redirect(url_for('company.job_admin'))
+
+
+@company.route('/job/new', methods=['GET', 'POST'])
+@company_required
+def add_job():
+    form = JobForm()
+    if form.validate_on_submit():
+        form.new_job(current_user.id, current_user.company_info.id)
+        flash('增加职位成功')
+        return redirect(url_for('company.job_admin'))
+    return render_template('company/admin/add_job.html', form=form)
+
+
+@company.route('/job/<int:job_id>/edit', methods=['GET', 'POST'])
+@company_required
+def edit_job(job_id):
+    job = Job.query.get_or_404(job_id)
+    form = JobForm(obj=job)
+    if form.validate_on_submit():
+        pass
+

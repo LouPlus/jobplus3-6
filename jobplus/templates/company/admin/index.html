@@ -6,7 +6,7 @@
 <br>
 <div class="container">
     <div class="row" id="side-navbar">
-        <div class="col-md-2 col-sm-2">
+        <div class="col-md-3 col-sm-3">
             <img src="{{ current_user.company_info.get_img('logo') }}" class="img-thumbnail img-circle center-block company-admin">
             <h3 class="text-center">{{ current_user.username }}</h3>
             <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="100%" color=#987cb9 SIZE=3>
@@ -26,6 +26,11 @@
                         <span><a href="#">邀请面试</a></span>
                     </div>
                 </li>
+                {% if active_page == 'jobs' %}
+                <li><a class="link" href="{{ url_for('company.add_job') }}"><i class="glyphicon glyphicon glyphicon-plus"></i>增加职位</a>
+                </li>
+                {% else %}
+                {% endif %}
             </ul>
             {% block operation %}{% endblock %}
         </div>
