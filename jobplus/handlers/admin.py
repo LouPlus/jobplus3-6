@@ -69,7 +69,7 @@ def add_user():
     if form.validate_on_submit():
         user = form.update_user_info()
         flash('已添加用户 ' + user.username, 'success')
-        return redirect(url_for('.user_list'))
+        return redirect(url_for('.add_user', action=action))
     return render_template('admin/admin_edit.html', form=form, action=action)
 
 

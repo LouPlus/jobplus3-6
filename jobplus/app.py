@@ -62,6 +62,25 @@ def register_filters(app):
         else:
             return "http://" + str(url)
 
+    @app.template_filter()
+    def long_string_cutter(long_string, max_length=20):
+        """
+        把长字符串按字符数剪短
+        :param long_string: 待处理的字符串
+        :param max_length: 最大长度
+        :return: 处理后的字符串
+
+        示例：
+        example_str = '一二三四五六七八九十一二三四五六'
+        {{ example_str  | long_string_cutter(12)}}
+        返回值为
+        '一二三四五六七八九十……'
+        """
+        if len(long_string) > max_length:
+            return long_string[:max_length-2] + '……'
+        else:
+            return long_string
+
 
 def register_blueprints(app):
     from .handlers import front, company, job, seeker, admin
