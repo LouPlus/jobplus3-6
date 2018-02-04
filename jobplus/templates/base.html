@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% set active_page = active_page | default('index') %}
+{% set active_page = active_page %}
 {% set navigation_left_bar = [
     ('/', 'index', '首页'),
     (url_for('job.list'), 'job', '职位'),
