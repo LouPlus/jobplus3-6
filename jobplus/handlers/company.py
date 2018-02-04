@@ -9,7 +9,6 @@ from flask_login import login_user, current_user, login_required
 from jobplus.models import User, Company, db
 from jobplus.forms import CompanyRegisterForm, CompanyProfileForm
 from jobplus.decorators import company_required
-from .job import job
 
 
 company = Blueprint('company', __name__, url_prefix='/company')
@@ -64,6 +63,7 @@ def company_detail(company_id):
     db.session.commit()
     return render_template('company/detail.html', company_obj=company)
 
+
 @company.route('/follow/<int:company_id>')
 @login_required
 def follow(company_id):
@@ -81,10 +81,9 @@ def follow(company_id):
 @company_required
 def job_admin():
     page = request.args.get('page', default=1, type=int)
-    id = request.args.get('id', default=1, type=int)
     filters = {
         Job.company_id == current_user.company_info.id,
-        Job.status != Job.STATUS_DELETE
+        Job.status != Job.STATUS_DELETE,
     }
     pagination = Job.query.filter(*filters).order_by(Job.updated_at.desc()).paginate(
         page=page,
