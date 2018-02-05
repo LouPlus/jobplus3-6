@@ -2,10 +2,11 @@
 # encoding: utf-8
 
 
-from flask import Blueprint, render_template, flash, redirect, url_for, current_app, request
-from flask_login import login_user, current_user
+from flask import Blueprint, render_template, flash, redirect, \
+                  url_for, current_app, request
+from flask_login import login_user, current_user, login_required
 
-from jobplus.models import User, Company, db, Company_follows
+from jobplus.models import User, Company, db
 from jobplus.forms import CompanyRegisterForm, CompanyProfileForm
 from jobplus.decorators import company_required
 
@@ -36,7 +37,7 @@ def company_profile():
     del form.name
     if form.validate_on_submit():
         form.add_company_profile(current_user.id, current_user.username)
-        flash('企业用户注册成功！')
+        flash('企业用户注册成功！','success')
         return redirect(url_for('front.index'))
     return render_template('company/profile.html', form=form)
 
@@ -64,11 +65,10 @@ def company_detail(company_id):
 
 
 @company.route('/follow/<int:company_id>')
+@login_required
 def follow(company_id):
     company = Company.query.get_or_404(company_id)
-    if not current_user.is_authenticated:
-        return redirect(url_for('front.login'))
-    elif current_user in company.follows:
+    if current_user in company.follows:
         company.follows.remove(current_user)
     else:
         company.follows.append(current_user)

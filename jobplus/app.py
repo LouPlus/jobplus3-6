@@ -52,12 +52,12 @@ def register_filters(app):
     
     @app.template_filter()
     def sentence_split(sentence):
-        return re.split(r",|\.|;|，|；|、|\s|/|\\", sentence)
+        return re.split(r",|\.|;|，|；|、|/|\\", sentence)
 
     @app.template_filter()
     def ex_link(url):
         url = str(url)
-        if 'http://' in url or 'https' in url:
+        if 'http://' in url or 'https://' in url:
             return url
         else:
             return "http://" + str(url)
@@ -80,6 +80,11 @@ def register_filters(app):
             return long_string[:max_length-2] + '……'
         else:
             return long_string
+
+    @app.template_filter()
+    def utc_to_cst(date_time):
+        timenow = (date_time + datetime.timedelta(hours=8))
+        return timenow
 
 
 def register_blueprints(app):
@@ -104,6 +109,8 @@ def register_extensions(app):
         return User.query.get(id)
 
     login_manager.login_view = 'front.login'
+    login_manager.login_message = '请登录后操作！'
+    login_manager.login_message_category = "danger"
 
 
 def create_app(config):

@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% from "macros.html" import render_index_job, render_index_company %}
 {% block title %}首页{% endblock %}
+{% set active_page = 'index' %}
+
 {% block body %}
 <h1>最新职位</h1>
 <div class="row">

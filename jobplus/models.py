@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -145,6 +146,8 @@ class Resume(Base):
     expect_job = db.Column(db.String(64))
     attachment = db.Column(db.String(256))
 
+    delivery = db.relationship('delivery')
+
     # statics
     # 已投递的职位数量
     jobs_applied_number = db.Column(db.Integer, default=0)
@@ -163,7 +166,7 @@ class Resume(Base):
 
 # 用户关注企业表
 Company_follows = db.Table('company_follows',
-                        db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'),primary_key=True),
+                        db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
                         db.Column('company_id', db.Integer, db.ForeignKey('company.id', ondelete='CASCADE'), primary_key=True))
 
 
@@ -189,12 +192,12 @@ class Company(Base):
     city = db.Column(db.String(32), default='北京', nullable=False)
     address = db.Column(db.String(512), nullable=False)
     scale = db.Column(db.SmallInteger, default=SCALE_15_LESS, nullable=False)
-    industry = db.Column(db.String(32))
+    industry = db.Column(db.String(256))
     email = db.Column(db.String(64), nullable=False)
     phone = db.Column(db.String(16), nullable=False)
     fax = db.Column(db.String(16))
     manager_name = db.Column(db.String(32))
-    manager_job = db.Column(db.String(32))
+    manager_job = db.Column(db.String(128))
     manager_photo = db.Column(db.String(256))
 
     slogan = db.Column(db.String(140))
@@ -209,9 +212,9 @@ class Company(Base):
     total_resume_number = db.Column(db.Integer, default=0)
     # 所有职位的总关注人数
     total_job_followers = db.Column(db.Integer, default=0)
-    view_count = db.Column(db.Integer)
+    view_count = db.Column(db.Integer, default=0)
 
-    job = db.relationship('Job')
+    jobs = db.relationship('Job', backref='company')
     follows = db.relationship('User', secondary=Company_follows, backref=db.backref('company_follows'))
 
     def __repr__(self):
@@ -237,14 +240,25 @@ class Company(Base):
     
     @property
     def new_job(self):
-        # return self.job.query.order_by(db.desc(self.job.id)).first()
-        return Job.query.first()
+        newest_job = Job.query.filter_by(company_id=self.id).\
+        order_by(Job.updated_at.desc()).first()
+        return newest_job
 
     def get_img(self, img):
         if img == 'logo':
+            if 'https' in self.logo or 'http' in self.logo:
+                return self.logo
             return '/static/company_img/' + self.logo
         if img == 'manager_photo':
+            if 'https' in self.manager_photo or 'http' in self.manager_photo:
+                return self.manager_photo
             return '/static/company_img/' + self.manager_photo
+
+    def get_job_status(self, status):
+        if status is 'online':
+            return [job for job in self.jobs if job.status is job.STATUS_OPENED]
+        elif status is 'offline':
+            return [job for job in self.jobs if job.status is job.STATUS_CLOSED]
  
 
 STATUS_SENT = 1
@@ -255,6 +269,7 @@ STATUS_REJECTED = 4
 Delivery = db.Table('delivery',
                     db.Column('resume_id', db.Integer, db.ForeignKey('resume.id', ondelete='CASCADE'), primary_key=True),
                     db.Column('job_id', db.Integer, db.ForeignKey('job.id', ondelete='CASCADE'), primary_key=True),
+                    db.Column('company_id', db.Integer, db.ForeignKey('company.id', ondelete='CASCADE'),
                     db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
                     )
 
@@ -278,9 +293,10 @@ class Job(Base):
     EDU_OTHER = 5
     edu_req_list = ['不限', '专科', '本科', '硕士', '博士', '其他']
 
-    # 职位状态，“正在招聘” 和 “招聘结束”
+    # 职位状态，“正在招聘” “招聘结束”及”已被删除”
     STATUS_OPENED = 0
     STATUS_CLOSED = -1
+    STATUS_DELETE = 1
 
     # 经验要求
     EXP_REQ_NO_LIMIT = 0
