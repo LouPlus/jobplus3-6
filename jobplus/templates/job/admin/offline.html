@@ -1,0 +1,10 @@
+{% extends "job/admin/index.html" %}
+{% from "macros.html" import render_pagination, render_company_jobs_admin %}
+{% set active_page='jobs' %}
+
+{% block title %}职位管理 - Jobplus{% endblock %}
+
+{% block admin %}
+{{ render_company_jobs_admin(pagination) }}
+{{ render_pagination(pagination, 'job.offline_job') }}
+{% endblock %}

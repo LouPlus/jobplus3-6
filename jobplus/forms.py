@@ -274,21 +274,23 @@ class JobForm(FlaskForm):
     ], default=1, render_kw={"placeholder":"请选择工作性质"})
     description = TextAreaField('职位介绍',  render_kw={"placeholder":"请输入公司描述信息"})
     work_address = StringField('工作地址', validators=[DataRequired()], render_kw={"placeholder":"请输入工作地址"})
-    status = SelectField('是否立即上线', choices=[
+    status = SelectField('是否上线', choices=[
         ('0', '立即上线'),
         ('-1', '暂不上线')])
     submit = SubmitField('提交')
 
+    def validate_is_full_time(self, field):
+        if field.data == '0':
+            field.data = False
+        else:
+            field.data = True
+    
     def new_job(self, user_id, company_id):
         """ 创建新职位，必须为企业用户
         Args:
             user_id (int): 企业用户id
             company_id (int): 企业用户详情id
         """
-        if self.is_full_time.data == '0':
-            is_full_time = False
-        else:
-            is_full_time = True
 
         job = Job()
         job.title = self.title.data
@@ -298,7 +300,7 @@ class JobForm(FlaskForm):
         job.salary_max = self.salary_max.data
         job.exp_required = self.exp_required.data
         job.edu_required = self.edu_required.data
-        job.is_full_time = is_full_time
+        job.is_full_time = self.is_full_time.data
         job.description = self.description.data
         job.work_address = self.work_address.data
         job.company_id = company_id
@@ -308,10 +310,10 @@ class JobForm(FlaskForm):
         except Exception as e:
             db.session.rollback()
 
-        def update_job(self, job):
-            self.populate_obj(job)
-            db.session.add(job)
-            db.session.commit()
+    def update_job(self, job):
+        self.populate_obj(job)
+        db.session.add(job)
+        db.session.commit()
 
 
     

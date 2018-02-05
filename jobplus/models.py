@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -145,6 +146,8 @@ class Resume(Base):
     expect_job = db.Column(db.String(64))
     attachment = db.Column(db.String(256))
 
+    delivery = db.relationship('delivery')
+
     # statics
     # 已投递的职位数量
     jobs_applied_number = db.Column(db.Integer, default=0)
@@ -163,7 +166,7 @@ class Resume(Base):
 
 # 用户关注企业表
 Company_follows = db.Table('company_follows',
-                        db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'),primary_key=True),
+                        db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
                         db.Column('company_id', db.Integer, db.ForeignKey('company.id', ondelete='CASCADE'), primary_key=True))
 
 
@@ -250,6 +253,12 @@ class Company(Base):
             if 'https' in self.manager_photo or 'http' in self.manager_photo:
                 return self.manager_photo
             return '/static/company_img/' + self.manager_photo
+
+    def get_job_status(self, status):
+        if status is 'online':
+            return [job for job in self.jobs if job.status is job.STATUS_OPENED]
+        elif status is 'offline':
+            return [job for job in self.jobs if job.status is job.STATUS_CLOSED]
  
 
 STATUS_SENT = 1
@@ -260,6 +269,7 @@ STATUS_REJECTED = 4
 Delivery = db.Table('delivery',
                     db.Column('resume_id', db.Integer, db.ForeignKey('resume.id', ondelete='CASCADE'), primary_key=True),
                     db.Column('job_id', db.Integer, db.ForeignKey('job.id', ondelete='CASCADE'), primary_key=True),
+                    db.Column('company_id', db.Integer, db.ForeignKey('company.id', ondelete='CASCADE'),
                     db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
                     )
 

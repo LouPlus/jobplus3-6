@@ -81,6 +81,11 @@ def register_filters(app):
         else:
             return long_string
 
+    @app.template_filter()
+    def utc_to_cst(date_time):
+        timenow = (date_time + datetime.timedelta(hours=8))
+        return timenow
+
 
 def register_blueprints(app):
     from .handlers import front, company, job, seeker, admin

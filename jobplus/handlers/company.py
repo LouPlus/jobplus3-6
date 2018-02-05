@@ -3,11 +3,11 @@
 
 
 from flask import Blueprint, render_template, flash, redirect, \
-url_for, current_app, request
+                  url_for, current_app, request
 from flask_login import login_user, current_user, login_required
 
-from jobplus.models import User, Company, db, Job
-from jobplus.forms import CompanyRegisterForm, CompanyProfileForm, JobForm
+from jobplus.models import User, Company, db
+from jobplus.forms import CompanyRegisterForm, CompanyProfileForm
 from jobplus.decorators import company_required
 
 
@@ -37,7 +37,7 @@ def company_profile():
     del form.name
     if form.validate_on_submit():
         form.add_company_profile(current_user.id, current_user.username)
-        flash('企业用户注册成功！')
+        flash('企业用户注册成功！','success')
         return redirect(url_for('front.index'))
     return render_template('company/profile.html', form=form)
 
@@ -75,65 +75,3 @@ def follow(company_id):
     db.session.add(company)
     db.session.commit()
     return redirect(url_for('company.company_detail', company_id=company_id))
-
-
-@company.route('/job/admin')
-@company_required
-def job_admin():
-    page = request.args.get('page', default=1, type=int)
-    filters = {
-        Job.company_id == current_user.company_info.id,
-        Job.status != Job.STATUS_DELETE,
-    }
-    pagination = Job.query.filter(*filters).order_by(Job.updated_at.desc()).paginate(
-        page=page,
-        per_page=current_app.config['LIST_PER_PAGE'],
-        error_out=False
-    )
-    return render_template('company/admin/jobs.html', pagination=pagination)
-
-
-@company.route('/job/status/<int:job_id>')
-@company_required
-def job_status(job_id):
-    job = Job.query.get_or_404(job_id)
-    online = Job.STATUS_OPENED
-    offline = Job.STATUS_CLOSED
-    if job.status == online:
-        job.status = offline
-    elif job.status == offline:
-        job.status = online
-    db.session.add(job)
-    db.session.commit()
-    return redirect(url_for('company.job_admin'))
-
-
-@company.route('/job/delete/<int:job_id>')
-@company_required
-def delete_job(job_id):
-    job = Job.query.get_or_404(job_id)
-    job.status = Job.STATUS_DELETE
-    db.session.add(job)
-    db.session.commit()
-    return redirect(url_for('company.job_admin'))
-
-
-@company.route('/job/new', methods=['GET', 'POST'])
-@company_required
-def add_job():
-    form = JobForm()
-    if form.validate_on_submit():
-        form.new_job(current_user.id, current_user.company_info.id)
-        flash('增加职位成功')
-        return redirect(url_for('company.job_admin'))
-    return render_template('company/admin/add_job.html', form=form)
-
-
-@company.route('/job/<int:job_id>/edit', methods=['GET', 'POST'])
-@company_required
-def edit_job(job_id):
-    job = Job.query.get_or_404(job_id)
-    form = JobForm(obj=job)
-    if form.validate_on_submit():
-        pass
-

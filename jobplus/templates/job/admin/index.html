@@ -14,9 +14,9 @@
                 <li>
                     <div class="link"><i class="glyphicon glyphicon-th-list"></i>职位管理<i class="glyphicon glyphicon-triangle-bottom"></i></div>
                     <div class="submenu">
-                        <span><a href="{{ url_for('company.job_admin') }}">所有职位<span class="badge">{{ current_user.company_info.jobs | count }}</span></a></span>
-                        <span><a href="#">在招职位<span class="badge">{{ current_user.company_info.jobs | count }}</span></a></span>
-                        <span><a href="#">已下线职位<span class="badge">{{ current_user.company_info.jobs | count }}</span></a></span>
+                        <span><a href="{{ url_for('job.job_admin') }}">所有职位<span class="badge">{{ current_user.company_info.jobs | count }}</span></a></span>
+                        <span><a href="{{ url_for('job.online_job') }}">在招职位<span class="badge">{{ current_user.company_info.get_job_status('online') | count }}</span></a></span>
+                        <span><a href="{{ url_for('job.offline_job') }}">已下线职位<span class="badge">{{ current_user.company_info.get_job_status('offline') | count }}</span></a></span>
                     </div>
                 </li>
                 <li><div class="link"><i class="glyphicon glyphicon-file"></i>简历管理<i class="glyphicon glyphicon-triangle-bottom"></i></div>
@@ -27,7 +27,7 @@
                     </div>
                 </li>
                 {% if active_page == 'jobs' %}
-                <li><a class="link" href="{{ url_for('company.add_job') }}"><i class="glyphicon glyphicon glyphicon-plus"></i>增加职位</a>
+                <li><a class="link" href="{{ url_for('job.add_job') }}"><i class="glyphicon glyphicon glyphicon-plus"></i>增加职位</a>
                 </li>
                 {% else %}
                 {% endif %}
