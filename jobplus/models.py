@@ -146,7 +146,7 @@ class Resume(Base):
     expect_job = db.Column(db.String(64))
     attachment = db.Column(db.String(256))
 
-    delivery = db.relationship('delivery')
+    #delivery = db.relationship('delivery')
 
     # statics
     # 已投递的职位数量
@@ -237,7 +237,7 @@ class Company(Base):
     @property
     def detail_url(self):
         return url_for('company.company_detail', company_id=self.id)
-    
+
     @property
     def new_job(self):
         newest_job = Job.query.filter_by(company_id=self.id).\
@@ -259,7 +259,7 @@ class Company(Base):
             return [job for job in self.jobs if job.status is job.STATUS_OPENED]
         elif status is 'offline':
             return [job for job in self.jobs if job.status is job.STATUS_CLOSED]
- 
+
 
 STATUS_SENT = 1
 STATUS_CHECKED = 2
@@ -269,7 +269,7 @@ STATUS_REJECTED = 4
 Delivery = db.Table('delivery',
                     db.Column('resume_id', db.Integer, db.ForeignKey('resume.id', ondelete='CASCADE'), primary_key=True),
                     db.Column('job_id', db.Integer, db.ForeignKey('job.id', ondelete='CASCADE'), primary_key=True),
-                    db.Column('company_id', db.Integer, db.ForeignKey('company.id', ondelete='CASCADE'),
+                   # db.Column('company_id', db.Integer, db.ForeignKey('company.id', ondelete='CASCADE')),
                     db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
                     )
 
