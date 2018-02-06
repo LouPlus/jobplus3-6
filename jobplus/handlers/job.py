@@ -176,8 +176,15 @@ def edit_job(job_id):
 @job.route('/apply/todolist')
 @company_required
 def todolist():
+    page = request.args.get('page', default=1, type=int)
     filters = {
-        Job.company_id == current_user.company_info.id,
-        Job.status == Job.STATUS_CLOSED,
+        company_id == current_user.company_info.id,
+        status == Delivery.STATUS_SENT,
     }
-    pass
+    pagination = Delivery.query.filter(*filters).paginate(
+        page=page,
+        per_page=current_app.config['LIST_PER_PAGE'],
+        error_out=False
+    )
+    return render_template('job/admin/todolist.html', pagination=pagination)
+    

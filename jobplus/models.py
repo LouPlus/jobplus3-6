@@ -120,20 +120,30 @@ class Seeker(Base):
     def url(self):
         pass
 
-
 STATUS_SENT = 1
 STATUS_CHECKED = 2
 STATUS_ACCEPTED = 3
 STATUS_REJECTED = 4
 
-Delivery = db.Table('delivery',
-                    db.Column('resume_id', db.Integer, db.ForeignKey('resume.id', ondelete='CASCADE'), primary_key=True),
-                    db.Column('job_id', db.Integer, db.ForeignKey('job.id', ondelete='CASCADE'), primary_key=True),
-                    db.Column('company_id', db.Integer, db.ForeignKey('company.id', ondelete='CASCADE')),
-                    db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
-                    )
+class Delivery(Base):
+    __tablename__ = 'delivery'
+    
+    
 
+    id = db.Column('id', db.Integer, primary_key=True)
+    resume_id = db.Column('resume_id', db.Integer, nullable=False, index=True)
+    job_id = db.Column('job_id', db.Integer, index=True, nullable=False)
+    company_id = db.Column('company_id', db.Integer, index=True, nullable=False)
+    status = db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
 
+    def get_job(self, job_id):
+        job = Job.query.filter_by(id=job_id).first()
+        return job
+    
+    def get_seeker(self, resume_id):
+        seeker = Resume.query.filter_by(id=resume_id).first().user.seeker_info
+        return seeker
+    
 # 简历表使用 MongoDB, 但暂时写个MySQL原型
 class Resume(Base):
     __tablename__ = 'resume'
@@ -227,7 +237,7 @@ class Company(Base):
 
     jobs = db.relationship('Job', backref='company')
     follows = db.relationship('User', secondary=Company_follows, backref=db.backref('company_follows'))
-    resume = db.relationship('Resume', secondary=Delivery, backref=db.backref('company'))
+    # resume = db.relationship('Resume', secondary=Delivery, backref=db.backref('company'))
 
     def __repr__(self):
         return '<Company(id={})>'.format(self.id)
@@ -323,7 +333,7 @@ class Job(Base):
     company_id = db.Column(db.Integer, db.ForeignKey('company.id', ondelete='CASCADE'))
 
     # relationship
-    resumes = db.relationship('Resume', secondary=Delivery, backref=db.backref('jobs'))
+    # resumes = db.relationship('Resume', secondary=Delivery, backref=db.backref('jobs'))
     following_users = db.relationship('User', secondary=Following, backref=db.backref('following_jobs'))
 
     # statics
