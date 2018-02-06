@@ -7,7 +7,7 @@ from random import randint, choice
 
 from faker import Faker
 
-from jobplus.models import db, User, Company, Job
+from jobplus.models import db, User, Company, Job, Resume
 
 
 fake = Faker(locale='zh-cn')
@@ -16,6 +16,34 @@ email_set = set()
 with open(os.path.join(os.path.dirname(__file__), 'data/company_data.json')) as f:
         company_detail = json.load(f)
 
+def iter_seeker_user():
+    email = fake.email()
+    while email in eamil_set:
+        email = fake.email()
+    email_set.add(email)
+    yield User(
+        username = fake.name(),
+        email = email,
+        password = '123456',
+        role = User.ROLE_SEEKER
+    )
+    
+def iter_resume():
+    seekers = iter_seeker_user()
+    for seeker in seekers:
+        db.session.add(seeker)
+        yield Resume(
+            user_id = seeker.id,
+            resume_type = randint(1, 2),
+            photo = 'http://img2.woyaogexing.com/2018/01/23/e4ec5a783bc2508a!400x400_big.jpg',
+            expect_salary_min = choice([1000,2000,3000,4000,5000]),
+            expect_salary_max = choice([6000,7000,8000,9000,10000]),
+            edu_exp = fake.text(),
+            self_intro = fake.text(),
+            project_exp = fake.text(),
+            expect_job = fake.sentence(),
+        )
+    
 def iter_users():
     for company in company_detail:
         name = company['name']

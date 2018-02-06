@@ -132,11 +132,11 @@ def job_status(job_id):
     db.session.add(job)
     try:
         db.session.commit()
-        return redirect(url_for('job.job_admin'))
+        return redirect(request.referrer)
     except Exception as e:
         db.session.rollback()
         flash('操作失败，请重试', 'warning')
-        return redirect(url_for('job.job_admin'))
+        return redirect(url_for(request.referrer))
 
 
 @job.route('/<int:job_id>/delete')
@@ -147,7 +147,7 @@ def delete_job(job_id):
     db.session.add(job)
     db.session.commit()
     flash('删除成功', 'success')
-    return redirect(url_for('job.job_admin'))
+    return redirect(url_for(request.referrer))
 
 
 @job.route('/new', methods=['GET', 'POST'])

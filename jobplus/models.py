@@ -121,6 +121,19 @@ class Seeker(Base):
         pass
 
 
+STATUS_SENT = 1
+STATUS_CHECKED = 2
+STATUS_ACCEPTED = 3
+STATUS_REJECTED = 4
+
+Delivery = db.Table('delivery',
+                    db.Column('resume_id', db.Integer, db.ForeignKey('resume.id', ondelete='CASCADE'), primary_key=True),
+                    db.Column('job_id', db.Integer, db.ForeignKey('job.id', ondelete='CASCADE'), primary_key=True),
+                    db.Column('company_id', db.Integer, db.ForeignKey('company.id', ondelete='CASCADE')),
+                    db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
+                    )
+
+
 # 简历表使用 MongoDB, 但暂时写个MySQL原型
 class Resume(Base):
     __tablename__ = 'resume'
@@ -145,8 +158,6 @@ class Resume(Base):
     project_exp = db.Column(db.Text)
     expect_job = db.Column(db.String(64))
     attachment = db.Column(db.String(256))
-
-    #delivery = db.relationship('delivery')
 
     # statics
     # 已投递的职位数量
@@ -216,6 +227,7 @@ class Company(Base):
 
     jobs = db.relationship('Job', backref='company')
     follows = db.relationship('User', secondary=Company_follows, backref=db.backref('company_follows'))
+    resume = db.relationship('Resume', secondary=Delivery, backref=db.backref('company'))
 
     def __repr__(self):
         return '<Company(id={})>'.format(self.id)
@@ -261,17 +273,7 @@ class Company(Base):
             return [job for job in self.jobs if job.status is job.STATUS_CLOSED]
 
 
-STATUS_SENT = 1
-STATUS_CHECKED = 2
-STATUS_ACCEPTED = 3
-STATUS_REJECTED = 4
 
-Delivery = db.Table('delivery',
-                    db.Column('resume_id', db.Integer, db.ForeignKey('resume.id', ondelete='CASCADE'), primary_key=True),
-                    db.Column('job_id', db.Integer, db.ForeignKey('job.id', ondelete='CASCADE'), primary_key=True),
-                   # db.Column('company_id', db.Integer, db.ForeignKey('company.id', ondelete='CASCADE')),
-                    db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
-                    )
 
 # 用户可以关注某个职位
 Following = db.Table('following',
