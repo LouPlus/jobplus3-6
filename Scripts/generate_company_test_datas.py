@@ -169,4 +169,7 @@ def run():
     except Exception as e:
         print(e)
         db.session.rollback()
+<<<<<<< HEAD
 
+=======
+>>>>>>> f675746aa3dfd9d571f682bb62da75a2dce6cb6e

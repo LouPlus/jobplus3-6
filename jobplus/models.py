@@ -299,7 +299,6 @@ class Company(Base):
         elif status is 'offline':
             return [job for job in self.jobs if job.status is job.STATUS_CLOSED]
 
-    
 
 
 # 用户可以关注某个职位
