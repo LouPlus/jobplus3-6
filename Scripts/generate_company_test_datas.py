@@ -28,7 +28,7 @@ def iter_seeker_user():
             password = '123456',
             role = User.ROLE_SEEKER
         )
-    
+
 def iter_resume():
     seekers = User.query.filter_by(role = 20).all()
     for seeker in seekers:
@@ -70,7 +70,6 @@ def iter_delivery():
             company_id = company.id,
             status = 1,
         )
-    
 
 def iter_users():
     for company in company_detail:
@@ -95,7 +94,7 @@ def get_photo():
 
 def iter_companys():
     photo = get_photo()
-    
+
     for company in company_detail:
         name = company['name']
         user = User.query.filter_by(username=name).first()
@@ -150,14 +149,19 @@ def run():
 
     # for company in iter_companys():
     #     db.session.add(company)
-    
     # for job in iter_jobs():
     #     db.session.add(job)
 
-    # for resume in iter_resume():
-    #     db.session.add(resume)
-    # for delivery in iter_delivery():
-    #     db.session.add(delivery)
+    for user in iter_seeker_user():
+        db.session.add(user)
+        db.session.commit()
+
+    for resume in iter_resume():
+        db.session.add(resume)
+
+    for delivery in iter_delivery():
+        db.session.add(delivery)
+
     for seeker in iter_seeker():
         db.session.add(seeker)
     try:

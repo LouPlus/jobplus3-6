@@ -7,7 +7,8 @@ from flask import (Blueprint, abort, current_app, flash, redirect,
 from flask_login import current_user
 
 from jobplus.decorators import company_required, roles_required
-from jobplus.models import Job, User, db, Delivery, Resume
+from jobplus.models import Job, User, db, Delivery, Resume, STATUS_REJECTED, STATUS_ACCEPTED
+
 from jobplus.forms import JobForm
 
 job = Blueprint('job', __name__, url_prefix='/job')
@@ -136,7 +137,7 @@ def job_status(job_id):
     except Exception as e:
         db.session.rollback()
         flash('操作失败，请重试', 'warning')
-        return redirect(url_for(request.referrer))
+        return redirect(request.referrer)
 
 
 @job.route('/<int:job_id>/delete')
@@ -147,7 +148,7 @@ def delete_job(job_id):
     db.session.add(job)
     db.session.commit()
     flash('删除成功', 'success')
-    return redirect(url_for(request.referrer))
+    return redirect(request.referrer)
 
 
 @job.route('/new', methods=['GET', 'POST'])
@@ -177,14 +178,38 @@ def edit_job(job_id):
 @company_required
 def todolist():
     page = request.args.get('page', default=1, type=int)
+    STATUS_SENT = 1
     filters = {
-        company_id == current_user.company_info.id,
-        status == Delivery.STATUS_SENT,
-    }
+        Delivery.company_id == current_user.company_info.id,
+        Delivery.status == STATUS_SENT,
+        }
     pagination = Delivery.query.filter(*filters).paginate(
         page=page,
         per_page=current_app.config['LIST_PER_PAGE'],
         error_out=False
-    )
+        )
     return render_template('job/admin/todolist.html', pagination=pagination)
-    
+
+
+@job.route('/apply/reject')
+@company_required
+def reject():
+    delivery_id = request.args.get('delivery')
+    delivery = Delivery.query.filter_by(id=delivery_id).first()
+    delivery.status = STATUS_REJECTED
+    db.session.add(delivery)
+    db.session.commit()
+    return redirect(request.referrer)
+
+
+@job.route('/apply/interview')
+@company_required
+def interview():
+    delivery_id = request.args.get('delivery')
+    delivery = Delivery.query.filter_by(id=delivery_id).first()
+    delivery.status = STATUS_ACCEPTED
+    db.session.add(delivery)
+    db.session.commit()
+    return redirect(request.referrer)
+
+#@job.route('/apply/')

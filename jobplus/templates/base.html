@@ -5,6 +5,11 @@
     (url_for('job.list'), 'job', '职位'),
     (url_for('company.company_list'), 'company', '公司')
     ] %}
+{% set navigation_right_bar = [
+    (url_for('company.register'), 'company_register', '企业注册'),
+    (url_for('seeker.register'), 'user_register', '用户注册'),
+    (url_for('front.login'), 'login', '登陆')
+    ]%}
 
 <html lang="zh-CN">
     <head>
@@ -43,22 +48,24 @@
                         {% endfor %}
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-
                     {% if not current_user.is_authenticated %}
                         <li><a href="{{ url_for('company.register')}}">企业注册</a></li>
                         <li><a href="{{ url_for('seeker.register') }}">用户注册</a></li>
                         <li><a href="{{ url_for('front.login') }}">登录</a></li>
                     {% else %}
-                        {% if current_user.is_company %}
-                        <li><a href="{{ url_for('job.job_admin') }}">管理</a></li>
-                        {% endif %}
+                        
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ current_user.username }}<span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                {% if current_user.is_admin %}
-                                <li><a href="{{ url_for('admin.user_list') }}">管理中心</a></li>
+                                {% if current_user.is_admin or current_user.is_company %}
+                                <li>
+                                    <a href="{% if current_user.is_admin %}
+                                             {{ url_for('admin.user_list') }}
+                                             {% else %}
+                                             {{ url_for('job.job_admin') }}{% endif %}" class="text-center">管理中心</a>
+                                </li>
                                 {% else %}
-                                <li><a href="{{ url_for('seeker.profile') }}">个人主页</a></li>
+                                <li><a href="{{ url_for('seeker.profile') }}" class="text-center">个人主页</a></li>
                                 {% endif %}
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{{ url_for('front.logout') }}" class="text-center">退出登录</a></li>

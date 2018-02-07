@@ -5,6 +5,6 @@
 {% block title %}职位管理 - Jobplus{% endblock %}
 
 {% block admin %}
-{{ render_company_jobs_admin(pagination) }}
+{{ render_company_jobs_admin(pagination, page_type='online') }}
 {{ render_pagination(pagination, 'job.online_job') }}
 {% endblock %}
