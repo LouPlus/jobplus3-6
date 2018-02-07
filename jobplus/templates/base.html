@@ -5,6 +5,7 @@
     (url_for('job.list'), 'job', '职位'),
     (url_for('company.company_list'), 'company', '公司')
     ] %}
+
 {% set navigation_right_bar = [
     (url_for('company.register'), 'company_register', '企业注册'),
     (url_for('seeker.register'), 'user_register', '用户注册'),
@@ -49,11 +50,13 @@
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                     {% if not current_user.is_authenticated %}
-                        <li><a href="{{ url_for('company.register')}}">企业注册</a></li>
-                        <li><a href="{{ url_for('seeker.register') }}">用户注册</a></li>
-                        <li><a href="{{ url_for('front.login') }}">登录</a></li>
+                        {% for href, id, caption in navigation_right_bar %}
+                        <li{% if id == active_page %} class="active" {% endif %}>
+                            <a href="{{ href }}">
+                            <span {% if id == active_page %}class="text-primary"{% endif %}>{{ caption|e }}</span>
+                        </a></li>
+                        {% endfor %}
                     {% else %}
-                        
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ current_user.username }}<span class="caret"></span></a>
                             <ul class="dropdown-menu">
@@ -62,7 +65,9 @@
                                     <a href="{% if current_user.is_admin %}
                                              {{ url_for('admin.user_list') }}
                                              {% else %}
-                                             {{ url_for('job.job_admin') }}{% endif %}" class="text-center">管理中心</a>
+                                             {{ url_for('job.job_admin') }}
+                                             {% endif %}" class="text-center">管理中心
+                                    </a>
                                 </li>
                                 {% else %}
                                 <li><a href="{{ url_for('seeker.profile') }}" class="text-center">个人主页</a></li>

@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, flash, redirect, \
                   url_for, current_app, request
 from flask_login import login_user, current_user, login_required
 
-from jobplus.models import User, Company, db
+from jobplus.models import User, Company, db, Job
 from jobplus.forms import CompanyRegisterForm, CompanyProfileForm
 from jobplus.decorators import company_required
 
@@ -53,7 +53,7 @@ def company_list():
     return render_template('company/list.html', pagination=pagination)
 
 
-@company.route('/<int:company_id>')
+@company.route('/detail/<int:company_id>')
 def company_detail(company_id):
     company = Company.query.get_or_404(company_id)
     if company.view_count is None:
@@ -75,3 +75,19 @@ def follow(company_id):
     db.session.add(company)
     db.session.commit()
     return redirect(url_for('company.company_detail', company_id=company_id))
+
+
+@company.route('/<int:company_id>/joblist')
+def company_joblist(company_id):
+    page = request.args.get('page', default=1, type=int)
+    company = Company.query.get_or_404(company_id)
+    filters = {
+        Job.company_id == company_id,
+        Job.status == Job.STATUS_OPENED 
+    }
+    pagination = Job.query.filter(*filters).paginate(
+        page=page,
+        per_page=10,
+        error_out=False
+    )
+    return render_template('company/joblist.html', pagination=pagination, company_obj=company)

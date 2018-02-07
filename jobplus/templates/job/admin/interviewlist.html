@@ -1,0 +1,9 @@
+{% extends "job/admin/index.html" %}
+{% from "macros.html" import render_company_resumes_admin, render_pagination %}
+
+{% block title %}简历管理 - Jobplus{% endblock %}
+
+{% block admin %}
+{{ render_company_resumes_admin(pagination, page_type='accept') }}
+{{ render_pagination(pagination, url_for('job.interviewlist')) }}
+{% endblock %}

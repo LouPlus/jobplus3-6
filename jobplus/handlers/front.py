@@ -20,6 +20,8 @@ def index():
     # 最新公司列表
     newest_companies_info = []
     for company in User.query.filter_by(role=User.ROLE_COMPANY).order_by(db.desc(User.created_at)).limit(8).all():
+        if company.company_info is None:
+            continue
         newest_companies_info.append(company.company_info)
 
     # 最新职位列表

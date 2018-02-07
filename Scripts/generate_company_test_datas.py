@@ -32,7 +32,6 @@ def iter_seeker_user():
 def iter_resume():
     seekers = User.query.filter_by(role = 20).all()
     for seeker in seekers:
-        print(seeker.id)
         yield Resume(
             user_id = seeker.id,
             resume_type = randint(1, 2),
@@ -144,13 +143,14 @@ def iter_jobs():
 
 
 def run():
-    # for user in iter_users():
-    #     db.session.add(user)
+    for user in iter_users():
+        db.session.add(user)
 
-    # for company in iter_companys():
-    #     db.session.add(company)
-    # for job in iter_jobs():
-    #     db.session.add(job)
+    for company in iter_companys():
+        db.session.add(company)
+        
+    for job in iter_jobs():
+        db.session.add(job)
 
     for user in iter_seeker_user():
         db.session.add(user)

@@ -7,7 +7,7 @@ from flask import (Blueprint, abort, current_app, flash, redirect,
 from flask_login import current_user
 
 from jobplus.decorators import company_required, roles_required
-from jobplus.models import Job, User, db, Delivery, Resume, STATUS_REJECTED, STATUS_ACCEPTED
+from jobplus.models import Job, User, db, Delivery, Resume, STATUS_REJECTED, STATUS_ACCEPTED, STATUS_SENT
 
 from jobplus.forms import JobForm
 
@@ -178,7 +178,6 @@ def edit_job(job_id):
 @company_required
 def todolist():
     page = request.args.get('page', default=1, type=int)
-    STATUS_SENT = 1
     filters = {
         Delivery.company_id == current_user.company_info.id,
         Delivery.status == STATUS_SENT,
@@ -212,4 +211,33 @@ def interview():
     db.session.commit()
     return redirect(request.referrer)
 
-#@job.route('/apply/')
+
+@job.route('/apply/interviewlist')
+@company_required
+def interviewlist():
+    page = request.args.get('page', default=1, type=int)
+    filters = {
+        Delivery.company_id == current_user.company_info.id,
+        Delivery.status == STATUS_ACCEPTED,
+        }
+    pagination = Delivery.query.filter(*filters).paginate(
+        page=page,
+        per_page=current_app.config['LIST_PER_PAGE'],
+        error_out=False
+        )
+    return render_template('job/admin/interviewlist.html', pagination=pagination)
+
+@job.route('/apply/rejectlist')
+@company_required
+def rejectlist():
+    page = request.args.get('page', default=1, type=int)
+    filters = {
+        Delivery.company_id == current_user.company_info.id,
+        Delivery.status == STATUS_REJECTED,
+        }
+    pagination = Delivery.query.filter(*filters).paginate(
+        page=page,
+        per_page=current_app.config['LIST_PER_PAGE'],
+        error_out=False
+        )
+    return render_template('job/admin/rejectlist.html', pagination=pagination)

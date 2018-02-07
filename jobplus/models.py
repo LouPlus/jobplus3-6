@@ -65,7 +65,20 @@ class User(Base, UserMixin):
     @property
     def is_company(self):
         return self.role == self.ROLE_COMPANY
-
+        
+    def get_resume_count(self, resume_type):
+        if resume_type is 'waiting':
+            resume_status = STATUS_SENT
+        elif resume_type is 'accept':
+            resume_status = STATUS_ACCEPTED
+        elif resume_type is 'reject':
+            resume_status = STATUS_REJECTED
+        filters = {
+            Delivery.company_id == self.company_info.id,
+            Delivery.status == resume_status,
+            }
+        resumes_count = len(Delivery.query.filter(*filters).all())
+        return resumes_count 
 
 class Seeker(Base):
     __tablename__ = 'seeker'
@@ -229,8 +242,6 @@ class Company(Base):
     # 统计数据
     # 发布的职位数
     jobs_number = db.Column(db.Integer, default=0)
-    # 正在招聘的职位数
-    jobs_available = db.Column(db.Integer, default=0)
     # 收到的简历数量
     total_resume_number = db.Column(db.Integer, default=0)
     # 所有职位的总关注人数
@@ -243,6 +254,10 @@ class Company(Base):
 
     def __repr__(self):
         return '<Company(id={})>'.format(self.id)
+
+    @property
+    def jobs_available(self):
+        return len(self.jobs)
 
     def update_statics(self):
         jobs = self.user.jobs
@@ -284,7 +299,7 @@ class Company(Base):
         elif status is 'offline':
             return [job for job in self.jobs if job.status is job.STATUS_CLOSED]
 
-
+    
 
 
 # 用户可以关注某个职位
