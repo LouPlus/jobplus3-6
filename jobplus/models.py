@@ -128,8 +128,6 @@ STATUS_REJECTED = 4
 class Delivery(Base):
     __tablename__ = 'delivery'
     
-    
-
     id = db.Column('id', db.Integer, primary_key=True)
     resume_id = db.Column('resume_id', db.Integer, nullable=False, index=True)
     job_id = db.Column('job_id', db.Integer, index=True, nullable=False)
@@ -143,6 +141,10 @@ class Delivery(Base):
     def get_seeker(self, resume_id):
         seeker = Resume.query.filter_by(id=resume_id).first().user.seeker_info
         return seeker
+    
+    def get_resume(self, resume_id):
+        resume = Resume.query.filter_by(id=resume_id).first()
+        return resume
     
 # 简历表使用 MongoDB, 但暂时写个MySQL原型
 class Resume(Base):
