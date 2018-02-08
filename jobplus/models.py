@@ -65,7 +65,20 @@ class User(Base, UserMixin):
     @property
     def is_company(self):
         return self.role == self.ROLE_COMPANY
-
+        
+    def get_resume_count(self, resume_type):
+        if resume_type is 'waiting':
+            resume_status = STATUS_SENT
+        elif resume_type is 'accept':
+            resume_status = STATUS_ACCEPTED
+        elif resume_type is 'reject':
+            resume_status = STATUS_REJECTED
+        filters = {
+            Delivery.company_id == self.company_info.id,
+            Delivery.status == resume_status,
+            }
+        resumes_count = len(Delivery.query.filter(*filters).all())
+        return resumes_count 
 
 class Seeker(Base):
     __tablename__ = 'seeker'
@@ -120,7 +133,32 @@ class Seeker(Base):
     def url(self):
         pass
 
+STATUS_SENT = 1
+STATUS_CHECKED = 2
+STATUS_ACCEPTED = 3
+STATUS_REJECTED = 4
 
+class Delivery(Base):
+    __tablename__ = 'delivery'
+    
+    id = db.Column('id', db.Integer, primary_key=True)
+    resume_id = db.Column('resume_id', db.Integer, nullable=False, index=True)
+    job_id = db.Column('job_id', db.Integer, index=True, nullable=False)
+    company_id = db.Column('company_id', db.Integer, index=True, nullable=False)
+    status = db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
+
+    def get_job(self, job_id):
+        job = Job.query.filter_by(id=job_id).first()
+        return job
+    
+    def get_seeker(self, resume_id):
+        seeker = Resume.query.filter_by(id=resume_id).first().user.seeker_info
+        return seeker
+    
+    def get_resume(self, resume_id):
+        resume = Resume.query.filter_by(id=resume_id).first()
+        return resume
+    
 # 简历表使用 MongoDB, 但暂时写个MySQL原型
 class Resume(Base):
     __tablename__ = 'resume'
@@ -145,8 +183,6 @@ class Resume(Base):
     project_exp = db.Column(db.Text)
     expect_job = db.Column(db.String(64))
     attachment = db.Column(db.String(256))
-
-    delivery = db.relationship('delivery')
 
     # statics
     # 已投递的职位数量
@@ -206,8 +242,6 @@ class Company(Base):
     # 统计数据
     # 发布的职位数
     jobs_number = db.Column(db.Integer, default=0)
-    # 正在招聘的职位数
-    jobs_available = db.Column(db.Integer, default=0)
     # 收到的简历数量
     total_resume_number = db.Column(db.Integer, default=0)
     # 所有职位的总关注人数
@@ -216,9 +250,15 @@ class Company(Base):
 
     jobs = db.relationship('Job', backref='company')
     follows = db.relationship('User', secondary=Company_follows, backref=db.backref('company_follows'))
+    # resume = db.relationship('Resume', secondary=Delivery, backref=db.backref('company'))
 
     def __repr__(self):
         return '<Company(id={})>'.format(self.id)
+
+    @property
+    def jobs_available(self):
+        job_available = len([job for job in self.jobs if job.status is job.STATUS_OPENED])
+        return job_available
 
     def update_statics(self):
         jobs = self.user.jobs
@@ -237,7 +277,7 @@ class Company(Base):
     @property
     def detail_url(self):
         return url_for('company.company_detail', company_id=self.id)
-    
+
     @property
     def new_job(self):
         newest_job = Job.query.filter_by(company_id=self.id).\
@@ -259,19 +299,9 @@ class Company(Base):
             return [job for job in self.jobs if job.status is job.STATUS_OPENED]
         elif status is 'offline':
             return [job for job in self.jobs if job.status is job.STATUS_CLOSED]
- 
+        elif status is 'all':
+            return [job for job in self.jobs if job.status is not job.STATUS_DELETE]
 
-STATUS_SENT = 1
-STATUS_CHECKED = 2
-STATUS_ACCEPTED = 3
-STATUS_REJECTED = 4
-
-Delivery = db.Table('delivery',
-                    db.Column('resume_id', db.Integer, db.ForeignKey('resume.id', ondelete='CASCADE'), primary_key=True),
-                    db.Column('job_id', db.Integer, db.ForeignKey('job.id', ondelete='CASCADE'), primary_key=True),
-                    db.Column('company_id', db.Integer, db.ForeignKey('company.id', ondelete='CASCADE'),
-                    db.Column('status', db.SmallInteger, default=STATUS_SENT, nullable=False)
-                    )
 
 # 用户可以关注某个职位
 Following = db.Table('following',
@@ -321,7 +351,7 @@ class Job(Base):
     company_id = db.Column(db.Integer, db.ForeignKey('company.id', ondelete='CASCADE'))
 
     # relationship
-    resumes = db.relationship('Resume', secondary=Delivery, backref=db.backref('jobs'))
+    # resumes = db.relationship('Resume', secondary=Delivery, backref=db.backref('jobs'))
     following_users = db.relationship('User', secondary=Following, backref=db.backref('following_jobs'))
 
     # statics

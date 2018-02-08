@@ -4,7 +4,8 @@
 {% set active_page = 'index' %}
 
 {% block body %}
-<h1>最新职位</h1>
+<h2>最新职位</h2>
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="100%" color=#987cb9 SIZE=3>
 <div class="row">
 {% for job in newest_jobs %}
     {{ render_index_job(job) }}
@@ -17,7 +18,8 @@
     <div class="col-md-4"></div>
 </div>
 <hr>
-<h1>热门职位</h1>
+<h2>热门职位</h2>
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="100%" color=#987cb9 SIZE=3>
 <div class="row">
 {% for job in popular_jobs %}
     {{ render_index_job(job) }}
@@ -30,7 +32,8 @@
     <div class="col-md-4"></div>
 </div>
 <hr>
-<h1>最新企业</h1>
+<h2>最新企业</h2>
+<HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="100%" color=#987cb9 SIZE=3>
 <div class="row">
 {% for company_info in newest_companies_info %}
     {{ render_index_company(company_info) }}

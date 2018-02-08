@@ -161,7 +161,7 @@
       <li class="active"><a href="#">{{page}} <span class="sr-only">(current)</span></a></li>
       {% endif %}
     {% else %}
-      <span class=ellipsis>…</span>
+      <li><span class=ellipsis>…</span></li>
     {% endif %}
   {% endfor %}
   <li{% if not pagination.has_next %} class="disabled"{% endif %}><a href="{{url_for(endpoint, page=pagination.next_num) if pagination.has_next else '#'}}">&raquo;</a></li>
@@ -169,9 +169,9 @@
 </nav>
 {% endmacro %}
 
-{% macro render_company_jobs_admin(pagination) %}
+{% macro render_company_jobs_admin(pagination, page_type) %}
 <div class="panel panel-default">
-    <div class="panel-heading" ><h4 class="text-center" style="color:#b63b4d">所有职位</h4></div>
+    <div class="panel-heading" ><h4 class="text-center" style="color:#b63b4d">{% if page_type=='all' %}所有职位{% elif page_type=='online' %}已上线职位{% elif page_type=='offline' %}已下线职位{% endif %}</h4></div>
     <table class="table table-hover table-striped ">
         <thead>
             <tr class='block-center'>
@@ -206,6 +206,43 @@
                         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 移除
                     </a>
                 </th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
+
+{% macro render_company_resumes_admin(pagination, page_type) %}
+<div class="panel panel-default">
+    <div class="panel-heading" ><h4 class="text-center" style="color:#b63b4d">{% if page_type=='waiting' %}待处理简历{% elif page_type=='reject' %}已拒绝简历{% elif page_type=='accept' %}已邀请面试{% endif %}</h4></div>
+    <table class="table table-hover table-striped ">
+        <thead>
+            <tr class='block-center'>
+                <th class="text-center">ID</th>
+                <th class="text-center">职位名称</th>
+                <th class="text-center">求职者信息</th>
+                <th class="text-center">简历</th>
+                <th class="text-center">投递时间</th>
+                {% if page_type == 'waiting' %}<th class="text-center">操作</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in pagination.items %}
+            <tr>
+                <th scope="row" class="text-center">{{ loop.index + (pagination.page - 1)*pagination.per_page }}</th>
+                <th class="text-center"><a href="{{ url_for('job.detail',job_id=item.job_id) }}">{{ item.get_job(item.job_id).title  }}</a></th>
+                <th class="text-center">{{ item.get_seeker(item.resume_id).name }}</th>
+                <th class="text-center"><a href="#">查看简历</a></th>
+                <th class="text-center">{{ item.updated_at |utc_to_cst }}</th>
+                {% if page_type == 'waiting' %}<th class="text-center">
+                    <a role="button" class="btn btn-success btn-xs" href="{{ url_for('job.reject', delivery=item.id)}}">
+                        <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> 不合适
+                    </a>
+                    <a role="button" class="btn btn-danger btn-xs" href="{{ url_for('job.interview', delivery=item.id) }}">
+                      <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span> 邀请面试
+                    </a>
+                </th>{% endif %}
             </tr>
             {% endfor %}
         </tbody>

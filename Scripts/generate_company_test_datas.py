@@ -7,7 +7,7 @@ from random import randint, choice
 
 from faker import Faker
 
-from jobplus.models import db, User, Company, Job
+from jobplus.models import db, User, Company, Job, Resume, Delivery, Seeker
 
 
 fake = Faker(locale='zh-cn')
@@ -15,6 +15,60 @@ email_set = set()
 
 with open(os.path.join(os.path.dirname(__file__), 'data/company_data.json')) as f:
         company_detail = json.load(f)
+
+def iter_seeker_user():
+    for seeker in range(1,10):
+        email = fake.email()
+        while email in email_set:
+            email = fake.email()
+        email_set.add(email)
+        yield User(
+            username = fake.name(),
+            email = email,
+            password = '123456',
+            role = User.ROLE_SEEKER
+        )
+
+def iter_resume():
+    seekers = User.query.filter_by(role = 20).all()
+    for seeker in seekers:
+        yield Resume(
+            user_id = seeker.id,
+            resume_type = randint(1, 2),
+            photo = 'http://img2.woyaogexing.com/2018/01/23/e4ec5a783bc2508a!400x400_big.jpg',
+            expect_salary_min = choice([1000,2000,3000,4000,5000]),
+            expect_salary_max = choice([6000,7000,8000,9000,10000]),
+            edu_exp = fake.text(),
+            self_intro = fake.text(),
+            project_exp = fake.text(),
+            expect_job = fake.sentence(),
+        )
+
+def iter_seeker():
+    users = User.query.filter_by(role=20).all()
+    for user in users:
+        yield Seeker(
+            user_id = user.id,
+            gender = choice([10,20]),
+            phone = fake.phone_number(),
+            name = fake.name(),
+            college = '清华大学',
+            education = choice([1,2,3,4,5]),
+            major = fake.job(),
+            service_year = randint(0,11)
+        )
+
+def iter_delivery():
+    company = Company.query.filter_by(name='腾讯').first()
+    seekers = User.query.filter_by(role=20).limit(5).all()
+    for seeker in seekers:
+        job = randint(0,19)
+        yield Delivery(
+            resume_id = seeker.resumes[0].id,
+            job_id = company.jobs[job].id,
+            company_id = company.id,
+            status = 1,
+        )
 
 def iter_users():
     for company in company_detail:
@@ -39,7 +93,7 @@ def get_photo():
 
 def iter_companys():
     photo = get_photo()
-    
+
     for company in company_detail:
         name = company['name']
         user = User.query.filter_by(username=name).first()
@@ -89,17 +143,33 @@ def iter_jobs():
 
 
 def run():
-    # for user in iter_users():
-        # db.session.add(user)
+    for user in iter_users():
+        db.session.add(user)
 
-    # for company in iter_companys():
-        # db.session.add(company)
-    
+    for company in iter_companys():
+        db.session.add(company)
+        
     for job in iter_jobs():
         db.session.add(job)
 
+    for user in iter_seeker_user():
+        db.session.add(user)
+        db.session.commit()
+
+    for resume in iter_resume():
+        db.session.add(resume)
+
+    for delivery in iter_delivery():
+        db.session.add(delivery)
+
+    for seeker in iter_seeker():
+        db.session.add(seeker)
     try:
         db.session.commit()
     except Exception as e:
         print(e)
         db.session.rollback()
+<<<<<<< HEAD
+
+=======
+>>>>>>> f675746aa3dfd9d571f682bb62da75a2dce6cb6e
