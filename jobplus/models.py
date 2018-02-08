@@ -257,7 +257,8 @@ class Company(Base):
 
     @property
     def jobs_available(self):
-        return len(self.jobs)
+        job_available = len([job for job in self.jobs if job.status is job.STATUS_OPENED])
+        return job_available
 
     def update_statics(self):
         jobs = self.user.jobs
@@ -298,7 +299,8 @@ class Company(Base):
             return [job for job in self.jobs if job.status is job.STATUS_OPENED]
         elif status is 'offline':
             return [job for job in self.jobs if job.status is job.STATUS_CLOSED]
-
+        elif status is 'all':
+            return [job for job in self.jobs if job.status is not job.STATUS_DELETE]
 
 
 # 用户可以关注某个职位
