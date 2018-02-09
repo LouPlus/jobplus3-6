@@ -5,7 +5,7 @@ from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 from flask import url_for
 
 db = SQLAlchemy()
@@ -79,6 +79,7 @@ class User(Base, UserMixin):
             }
         resumes_count = len(Delivery.query.filter(*filters).all())
         return resumes_count 
+
 
 class Seeker(Base):
     __tablename__ = 'seeker'
@@ -370,3 +371,10 @@ class Job(Base):
     def update_statics(self):
         self.resume_number = len(self.resumes)
         self.follower_number = len(self.following_users)
+
+    @property
+    def current_user_is_applied(self):
+        resume_id=Resume.query.filter_by(user_id=current_user.id).first().id
+        if resume_id:
+            d = Delivery.query.filter_by(job_id=self.id,resume_id=resume_id).first()
+        return (d is not None)
