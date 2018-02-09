@@ -42,7 +42,14 @@
     </p>
     </div>
     <div class="col-md-3 col-xs-12">
-        <p><a href="#" class="btn btn-primary" role="button">投递</a><span class="glyphicon glyphicon-hand-left"></span><b>快速投递</b></p>
+        <p>
+            {% if not job.current_user_is_applied %}
+             <a href=" {{ url_for('job.apply',job_id=job.id) }}" class="btn btn-primary" role="button"  >投递</a>
+             {% else %}
+             <a href="#" class="btn btn-primary" role="button" disabled="disabled" >已投递</a>
+            {% endif %}
+             <span class="glyphicon glyphicon-hand-left"></span><b>快速投递</b>
+        </p>
         <p><a href="#" class="btn btn-default" role="button">关注</a> <strong>{{ job.follower_number }}</strong>关注 <strong>{{ job.resume_number }}</strong>投递</p>
     </div>
  </div>
@@ -62,7 +69,14 @@
             {% endif %}</p>
         <hr>
      <p>{{ job.created_at | timesince }} 发布</p>
-     <p><a href="#" class="btn btn-primary" role="button">投个简历</a><span class="glyphicon glyphicon-hand-left"></span><b>感兴趣？快速投递</b></p>
+     <p>
+          {% if not job.current_user_is_applied %}
+            <a href=" {{ url_for('job.apply',job_id=job.id) }}" class="btn btn-primary" role="button"  >投个简历</a>
+            {% else %}
+            <a href="#" class="btn btn-primary" role="button" disabled="disabled" >已投递</a>
+          {% endif %}
+
+         <span class="glyphicon glyphicon-hand-left"></span><b>感兴趣？快速投递</b></p>
  </div>
   <div class="col-md-3">
 

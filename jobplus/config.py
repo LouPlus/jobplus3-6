@@ -12,7 +12,7 @@ class BaseConfig(object):
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root@localhost:3306/jobplus?charset=utf8'
+    SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root:12345678@localhost:3306/jobplus3?charset=utf8'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TEMPLATES_AUTO_RELOAD = True
     # 企业相关图片文件路径

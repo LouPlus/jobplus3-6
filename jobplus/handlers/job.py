@@ -32,6 +32,28 @@ def detail(job_id):
     return render_template('job/detail.html', job=Job.query.get_or_404(job_id))
 
 
+@job.route('/<int:job_id>/apply')
+@roles_required(User.ROLE_SEEKER)
+def apply(job_id):
+    job = Job.query.get_or_404(job_id)
+    resume = Resume.query.filter_by(user_id=current_user.id).first()
+    if resume is None:
+        flash('请上传简历后再投递', 'danger')
+    elif resume:
+        flash('已经投递过该职位', 'danger')
+    else:
+        d = Delivery(
+            resume_id=resume.id,
+            job_id=job.id,
+            company_id =job.company.id,
+            status=1
+        )
+        db.session.add(d)
+        db.session.commit()
+        flash('投递成功', 'success')
+    return render_template('job/detail.html', job=job)
+
+
 @job.route('/<int:job_id>/enable')
 @roles_required(User.ROLE_COMPANY, User.ROLE_ADMIN)
 def enable(job_id):
