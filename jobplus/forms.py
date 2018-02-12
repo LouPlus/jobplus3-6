@@ -167,7 +167,7 @@ class CompanyProfileForm(FlaskForm):
                                 render_kw={"placeholder":"请输入招聘负责人"})
     manager_job = StringField('负责人职位', validators=[DataRequired(message='请输入招聘负责人职位')], 
                                 render_kw={"placeholder":"请输入招聘负责人职位"})
-    manager_img = FileField('招聘负责人头像', validators=[FileAllowed(photos, '只能上传图片')])
+    manager_img = FileField('招聘负责人头像', validators=[FileAllowed(photos, '只能上传图片'), FileRequired('文件未选择！')])
     email = StringField('接收简历邮箱', validators=[DataRequired(message='请输入接收简历的公司邮箱'), Email()])
     phone = StringField('联系电话',render_kw={"placeholder":"请输入公司联系电话"})
     fax = StringField('传真', render_kw={"placeholder":"请输入公司传真"})
@@ -204,7 +204,7 @@ class CompanyProfileForm(FlaskForm):
             return filename
 
         filename = str(user_id) + '_' + secure_filename(field_data.filename)
-        size = (100, 100) 
+        size = (150, 150) 
         img_path = current_app.config['UPLOADED_PHOTOS_DEST']
 
         im = Image.open(field_data)
@@ -244,6 +244,20 @@ class CompanyProfileForm(FlaskForm):
         company.slogan = self.slogan.data
         company.products_display = self.products_display.data
         company.description = self.description.data
+        db.session.add(company)
+        db.session.commit()
+
+    def update_profile(self, company):
+        self.populate_obj(company)
+        logo = self.logo.data
+        if not isinstance(logo, str):
+            logo_filename = self.change_img(logo, company.user.id)
+            company.logo = logo_filename
+        if self.manager_img.data:
+            manager_img = self.manager_img.data
+            if not isinstance(manager_img, str):
+                manager_img_filename = self.change_img(manager_img, company.user.id)
+                company.manager_photo = manager_img_filename
         db.session.add(company)
         db.session.commit()
 
@@ -293,6 +307,7 @@ class JobForm(FlaskForm):
         """
 
         job = Job()
+        company = Company()
         job.title = self.title.data
         job.status = self.status.data
         job.user_id = user_id
@@ -304,7 +319,9 @@ class JobForm(FlaskForm):
         job.description = self.description.data
         job.work_address = self.work_address.data
         job.company_id = company_id
+        company.updated_at = datetime.datetime.utcnow
         db.session.add(job)
+        db.session.add(company)
         try:
             db.session.commit()
         except Exception as e:
@@ -312,7 +329,11 @@ class JobForm(FlaskForm):
 
     def update_job(self, job):
         self.populate_obj(job)
+        company = job.company
+        company.updated_at = datetime.datetime.utcnow
         db.session.add(job)
+        company.updated_at = datetime.datetime.utcnow()
+        db.session.add(company)
         db.session.commit()
 
 

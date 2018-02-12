@@ -34,11 +34,17 @@
             </div>
             <div class="col-md-3 hidden-xs">
                 <div class="mb10">
-                        {% if current_user in company_obj.follows %}
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.role==current_user.ROLE_COMPANY and current_user.company_info.name == company_obj.name %}
+                            <a href="{{ url_for('company.edit_profile') }}" class="btn btn-sm btn-primary active" role="button" style="margin-right:5px;">修改信息</a>
+                        {% elif current_user in company_obj.follows %}
                             <a href="{{ url_for('company.follow', company_id=company_obj.id) }}" class="btn btn-sm btn-primary active" role="button" style="margin-right:5px;">取消关注</a>
                         {% else %}
-                            <a href="{{ url_for('company.follow', company_id=company_obj.id) }}" class="btn btn-sm btn-success active" role="button" style="margin-right:5px;">关注</a>
+                        <a href="{{ url_for('company.follow', company_id=company_obj.id) }}" class="btn btn-sm btn-success active" role="button" style="margin-right:5px;">关注</a>
                         {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('company.follow', company_id=company_obj.id) }}" class="btn btn-sm btn-success active" role="button" style="margin-right:5px;">关注</a>
+                    {% endif %}
                     <span><strong> {{ company_obj.follows | length }}</strong> 人关注， </span>
                     <span><strong>{{ company_obj.view_count }}</strong>浏览</span>
                 </div>
@@ -52,12 +58,10 @@
                 <ul class="nav nav-tabs" style="margin-left:15px;">
                         {% for href, id, caption in company_detail_navbar %}
                         <li role="presentation" {% if id == detail_active_page %} class="active"{% endif %}>
-                            <a href="{{ href }}" {% if id == detail_active_page %} class="  disabled"{% endif %}>
-                            <span {% if id == detail_active_page %}class="text-success"{% endif %}>{{ caption|e }}</span>
+                            <a href="{{ href }}">
+                            <span {% if id == detail_active_page %}class="text-success"{% endif %}>{{ caption|e }}{% if id == 'company_joblist' %}<span class="badge">{{ company_obj.jobs_available }}</span>{% endif %}</span>
                         </a></li>
                         {% endfor %}
-                    <!-- <li role="presentation" class="active"><a href="#">企业主页</a></li>
-                    <li role="presentation"><a href="#">招聘职位</a></li> -->
                 </ul>
             </div>
         </div>
@@ -90,7 +94,7 @@
                                 <h4>{{ company_obj.manager_job }}</h4>
                             </div>
                         </div>
-                        {% if job %}
+                        {% if job and detail_active_page == 'company_detail' %}
                             <div class="panel panel-success" style="margin-top: 20px;">
                                 <div class="panel-heading">
                                     <h3 class="panel-title text-center">最新招聘职位</h3>
@@ -104,7 +108,7 @@
                                         <span style="color:indianred;">{{ job.salary_min }}-{{ job.salary_max }}</span>
                                         <span style="margin-left:4px;">{{ job.exp_req_list[job.exp_required] }}</span>
                                     </p>
-                                    <a href="#">查看全部职位→</a>
+                                    <a href="{{ url_for('company.company_joblist', company_id=company_obj.id) }}">查看全部职位→</a>
                                 </div>
                             </div>
                         {% endif %}
