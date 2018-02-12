@@ -8,7 +8,8 @@ from flask import (Blueprint, abort, current_app, flash, redirect,
 from flask_login import current_user, login_required
 
 from jobplus.decorators import company_required, roles_required
-from jobplus.models import Job, User, db, Delivery, Company, Resume, STATUS_REJECTED, STATUS_ACCEPTED, STATUS_SENT
+from jobplus.models import Job, User, db, Delivery, Resume,\
+                           STATUS_REJECTED, STATUS_ACCEPTED, STATUS_SENT
 
 from jobplus.forms import JobForm
 
@@ -47,7 +48,7 @@ def apply(job_id):
         d = Delivery(
             resume_id=resume.id,
             job_id=job.id,
-            company_id =job.company.id,
+            company_id=job.company.id,
             status=1
         )
         db.session.add(d)
@@ -184,7 +185,7 @@ def add_job():
     form = JobForm()
     if form.validate_on_submit():
         form.new_job(current_user.id, current_user.company_info.id)
-        flash('增加职位成功','success')
+        flash('增加职位成功', 'success')
         return redirect(url_for('job.job_admin'))
     return render_template('job/admin/add_job.html', form=form)
 
@@ -208,12 +209,12 @@ def todolist():
     filters = {
         Delivery.company_id == current_user.company_info.id,
         Delivery.status == STATUS_SENT,
-        }
+    }
     pagination = Delivery.query.filter(*filters).paginate(
         page=page,
         per_page=current_app.config['LIST_PER_PAGE'],
         error_out=False
-        )
+    )
     return render_template('job/admin/todolist.html', pagination=pagination)
 
 
@@ -246,12 +247,12 @@ def interviewlist():
     filters = {
         Delivery.company_id == current_user.company_info.id,
         Delivery.status == STATUS_ACCEPTED,
-        }
+    }
     pagination = Delivery.query.filter(*filters).paginate(
         page=page,
         per_page=current_app.config['LIST_PER_PAGE'],
         error_out=False
-        )
+    )
     return render_template('job/admin/interviewlist.html', pagination=pagination)
 
 
@@ -262,10 +263,10 @@ def rejectlist():
     filters = {
         Delivery.company_id == current_user.company_info.id,
         Delivery.status == STATUS_REJECTED,
-        }
+    }
     pagination = Delivery.query.filter(*filters).paginate(
         page=page,
         per_page=current_app.config['LIST_PER_PAGE'],
         error_out=False
-        )
+    )
     return render_template('job/admin/rejectlist.html', pagination=pagination)
