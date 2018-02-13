@@ -45,7 +45,7 @@ def company_profile():
 @company.route('/')
 def company_list():
     page = request.args.get('page', default=1, type=int)
-    pagination = Company.query.paginate(
+    pagination = Company.query.order_by(Company.updated_at.desc()).paginate(
         page=page,
         per_page=current_app.config['LIST_PER_PAGE'],
         error_out=False
@@ -85,9 +85,21 @@ def company_joblist(company_id):
         Job.company_id == company_id,
         Job.status == Job.STATUS_OPENED 
     }
-    pagination = Job.query.filter(*filters).paginate(
+    pagination = Job.query.filter(*filters).order_by(Job.updated_at.desc()).paginate(
         page=page,
         per_page=10,
         error_out=False
     )
     return render_template('company/joblist.html', pagination=pagination, company_obj=company)
+
+
+@company.route('/edit', methods=['GET', 'POST'])
+@company_required
+def edit_profile():
+    company = current_user.company_info
+    form = CompanyProfileForm(obj=company)
+    if form.is_submitted():
+        form.update_profile(company)
+        flash('更新成功', 'success')
+        return redirect(url_for('company.company_detail', company_id=company.id))
+    return render_template('company/edit_profile.html', form=form)

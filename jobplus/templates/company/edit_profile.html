@@ -1,0 +1,10 @@
+{% extends "company/profile.html" %}
+
+{% block title %}修改企业信息 - Jobplus{% endblock %}
+
+{% block body %}
+<div class="form">
+    <h3>修改企业信息</h3>
+    {{ render_form(form, url_for('company.edit_profile')) }}
+</div>
+{% endblock %}

@@ -35,7 +35,7 @@
             <p>
               <small>
                 <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                <a class="company-list-single-info-num" target="_blank" href="#"><span>{{ company.jobs_available }}</span></a>
+                <a class="company-list-single-info-num" target="_blank" href="{{ url_for('company.company_joblist', company_id=company.id) }}"><span>{{ company.jobs_available }}</span></a>
                 <span>个在招职位</span>
               </small>
             </p>

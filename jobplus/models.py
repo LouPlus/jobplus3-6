@@ -14,7 +14,7 @@ db = SQLAlchemy()
 class Base(db.Model):
     __abstract__ = True
     created_at = db.Column(db.DateTime, default=datetime.utcnow, )
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow())
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class User(Base, UserMixin):
@@ -258,8 +258,8 @@ class Company(Base):
 
     @property
     def jobs_available(self):
-        job_available = len([job for job in self.jobs if job.status is job.STATUS_OPENED])
-        return job_available
+        job_available = [job for job in self.jobs if job.status is job.STATUS_OPENED]
+        return len(job_available)
 
     def update_statics(self):
         jobs = self.user.jobs
@@ -287,11 +287,11 @@ class Company(Base):
 
     def get_img(self, img):
         if img == 'logo':
-            if 'https' in self.logo or 'http' in self.logo:
+            if self.logo.startswith('http'):
                 return self.logo
             return '/static/company_img/' + self.logo
         if img == 'manager_photo':
-            if 'https' in self.manager_photo or 'http' in self.manager_photo:
+            if self.manager_photo.startswith('http'):
                 return self.manager_photo
             return '/static/company_img/' + self.manager_photo
 

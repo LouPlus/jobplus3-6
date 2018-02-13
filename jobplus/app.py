@@ -7,7 +7,7 @@ import re
 from flask import Flask
 from flask_migrate import Migrate
 from flask_login import LoginManager
-from flask_uploads import configure_uploads, patch_request_class
+from flask_uploads import configure_uploads
 
 from jobplus.config import configs
 from jobplus.models import db, User
@@ -86,6 +86,21 @@ def register_filters(app):
         timenow = (date_time + datetime.timedelta(hours=8))
         return timenow
 
+    @app.template_filter()
+    def salary_format(salary):
+        """ 将数据库内存储的工资数据格式化输出
+            Args:
+                salary (int): 工资数据
+            
+            e.g. 1000 => 1k
+        """
+        if salary >= 1000:
+            if salary % 1000:
+                num = round(salary/1000, 1)
+                return ''.join([str(num), 'k'])
+            else:
+                num = int(salary/1000)
+                return ''.join([str(num), 'k'])
 
 def register_blueprints(app):
     from .handlers import front, company, job, seeker, admin

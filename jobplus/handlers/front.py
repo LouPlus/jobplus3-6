@@ -68,5 +68,5 @@ def login():
 def logout():
     logout_user()
     flash('您已退出登录', 'success')
-    return redirect(url_for('.index'))
+    return redirect(request.referrer)
 

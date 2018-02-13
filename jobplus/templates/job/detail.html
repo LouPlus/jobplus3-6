@@ -8,49 +8,31 @@
 <div class="jumbotron">
  <div class="container row">
     <div class="col-md-9 col-xs-12 caption">
-        <h2>{{ job.title }}</h2>
+        <h2 style="margin-top:-6px;height:45px;">{{ job.title }}</h2>
     <p>
             {% if job.salary_min == 0 and job.salary_max ==0 %}
-              <b>面议</b>
-              {% else %}
-              <b>
-                {% if job.salary_min >= 1000 %}
-                    {{ (job.salary_min//1000) }}K
-                {% else %}
-                    {{ job.salary_min }}
-                {% endif %}
-                  ~
-                {% if job.salary_max >= 1000 %}
-                    {% if (job.salary_max//1000) == (job.salary_min//1000) %}
-                        {{ (job.salary_max//1000) + 1 }}K
-                    {% else %}
-                    {{ (job.salary_max//1000) }}K
-                    {% endif %}
-                {% else %}
-                    {{ job.salary_max }}
-                {% endif %}
-              {% endif %}
-              </b>
-            <b>&nbsp;&nbsp;&nbsp;{{ job.work_address[0:2] }}&nbsp;&nbsp;&nbsp;经验{{ job.exp_req_list[job.exp_required] }}&nbsp;&nbsp;&nbsp;{{ job.edu_req_list[job.edu_required] }}
-            &nbsp;&nbsp;&nbsp;
-            {% if job.is_full_time ==True %}
-                全职
+              <b>工资面议</b>
             {% else %}
-                兼职
+              <b>
+                {{ job.salary_min | salary_format }} - {{ job.salary_max | salary_format }}
+              </b>
             {% endif %}
-            </b>
+            <b><small>&nbsp;&nbsp;&nbsp;{{ job.work_address[0:2] }}&nbsp;&nbsp;&nbsp;经验{{ job.exp_req_list[job.exp_required] }}&nbsp;&nbsp;&nbsp;{{ job.edu_req_list[job.edu_required] }}
+            &nbsp;&nbsp;&nbsp;
+            {{ '全职' if job.is_full_time ==True else '兼职' }}
+            </small></b>
     </p>
     </div>
-    <div class="col-md-3 col-xs-12">
+    <div class="col-md-3 hidden-xs">
         <p>
             {% if not job.current_user_is_applied %}
-             <a href=" {{ url_for('job.apply',job_id=job.id) }}" class="btn btn-primary" role="button"  >投递</a>
+             <a href=" {{ url_for('job.apply',job_id=job.id) }}" class="btn btn-primary btn-sm" role="button" style="margin-right:5px;margin-top:-8px">投递</a>
              {% else %}
-             <a href="#" class="btn btn-primary" role="button" disabled="disabled" >已投递</a>
+             <a href="#" class="btn btn-primary btn-sm" role="button" disabled="disabled" style="margin-right:5px;margin-top:-8px">已投递</a>
             {% endif %}
-             <span class="glyphicon glyphicon-hand-left"></span><b>快速投递</b>
+             <span class="glyphicon glyphicon-hand-left" style="margin-right:5px;"></span><strong><small>快速投递</small></strong>
         </p>
-        <p><a href="#" class="btn btn-default" role="button">关注</a> <strong>{{ job.follower_number }}</strong>关注 <strong>{{ job.resume_number }}</strong>投递</p>
+        <p><a href="#" class="btn btn-default btn-sm" role="button" style="margin-right:5px;margin-top:-8px">关注</a> <strong><small>{{ job.follower_number }} 关注 {{ job.resume_number }} 投递</small></p>
     </div>
  </div>
 </div>
@@ -71,15 +53,13 @@
      <p>{{ job.created_at | timesince }} 发布</p>
      <p>
           {% if not job.current_user_is_applied %}
-            <a href=" {{ url_for('job.apply',job_id=job.id) }}" class="btn btn-primary" role="button"  >投个简历</a>
+            <a href=" {{ url_for('job.apply',job_id=job.id) }}" class="btn btn-primary btn-sm" role="button" style="margin-right:5px;">投个简历</a>
             {% else %}
             <a href="#" class="btn btn-primary" role="button" disabled="disabled" >已投递</a>
           {% endif %}
-
-         <span class="glyphicon glyphicon-hand-left"></span><b>感兴趣？快速投递</b></p>
+          <b><span class="glyphicon glyphicon-hand-left" style="margin-right:5px;"></span>感兴趣？快速投递</b></p>
  </div>
   <div class="col-md-3">
-
       <div class="thumbnail">
           {% if job.user.company_info.logo == None %}
           <img src="{{ url_for('static', filename='img/default_logo.jpg') }}" alt="...">
@@ -96,7 +76,6 @@
               </p>
           </div>
       </div>
-
   </div>
 </div>
 {% endblock %}
