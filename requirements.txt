@@ -1,7 +1,10 @@
+Faker==0.8.10
 Flask==0.12.2
 Flask-Login==0.4.1
 Flask-Migrate==2.1.1
 flask-shell-ipython==0.3.0
 Flask-SQLAlchemy==2.3.2
+Flask-Uploads==0.2.1
 Flask-WTF==0.14.2
 mysqlclient==1.3.12
+Pillow==5.0.0

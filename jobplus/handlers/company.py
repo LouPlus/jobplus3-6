@@ -2,10 +2,11 @@
 # encoding: utf-8
 
 
-from flask import Blueprint, render_template, flash, redirect, url_for, current_app, request
-from flask_login import login_user, current_user
+from flask import Blueprint, render_template, flash, redirect, \
+                  url_for, current_app, request
+from flask_login import login_user, current_user, login_required
 
-from jobplus.models import User, Company, db, Company_follows
+from jobplus.models import User, Company, db, Job
 from jobplus.forms import CompanyRegisterForm, CompanyProfileForm
 from jobplus.decorators import company_required
 
@@ -36,7 +37,7 @@ def company_profile():
     del form.name
     if form.validate_on_submit():
         form.add_company_profile(current_user.id, current_user.username)
-        flash('企业用户注册成功！')
+        flash('企业用户注册成功！','success')
         return redirect(url_for('front.index'))
     return render_template('company/profile.html', form=form)
 
@@ -44,7 +45,7 @@ def company_profile():
 @company.route('/')
 def company_list():
     page = request.args.get('page', default=1, type=int)
-    pagination = Company.query.paginate(
+    pagination = Company.query.order_by(Company.updated_at.desc()).paginate(
         page=page,
         per_page=current_app.config['LIST_PER_PAGE'],
         error_out=False
@@ -52,7 +53,7 @@ def company_list():
     return render_template('company/list.html', pagination=pagination)
 
 
-@company.route('/<int:company_id>')
+@company.route('/detail/<int:company_id>')
 def company_detail(company_id):
     company = Company.query.get_or_404(company_id)
     if company.view_count is None:
@@ -64,14 +65,41 @@ def company_detail(company_id):
 
 
 @company.route('/follow/<int:company_id>')
+@login_required
 def follow(company_id):
     company = Company.query.get_or_404(company_id)
-    if not current_user.is_authenticated:
-        return redirect(url_for('front.login'))
-    elif current_user in company.follows:
+    if current_user in company.follows:
         company.follows.remove(current_user)
     else:
         company.follows.append(current_user)
     db.session.add(company)
     db.session.commit()
     return redirect(url_for('company.company_detail', company_id=company_id))
+
+
+@company.route('/<int:company_id>/joblist')
+def company_joblist(company_id):
+    page = request.args.get('page', default=1, type=int)
+    company = Company.query.get_or_404(company_id)
+    filters = {
+        Job.company_id == company_id,
+        Job.status == Job.STATUS_OPENED 
+    }
+    pagination = Job.query.filter(*filters).order_by(Job.updated_at.desc()).paginate(
+        page=page,
+        per_page=10,
+        error_out=False
+    )
+    return render_template('company/joblist.html', pagination=pagination, company_obj=company)
+
+
+@company.route('/edit', methods=['GET', 'POST'])
+@company_required
+def edit_profile():
+    company = current_user.company_info
+    form = CompanyProfileForm(obj=company)
+    if form.is_submitted():
+        form.update_profile(company)
+        flash('更新成功', 'success')
+        return redirect(url_for('company.company_detail', company_id=company.id))
+    return render_template('company/edit_profile.html', form=form)

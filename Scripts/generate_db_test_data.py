@@ -217,9 +217,9 @@ def empty_db():
         print('---开始清空数据表---')
         empty_table(User)
         empty_table(Seeker)
-        empty_table(Company)
+        # empty_table(Company)
         empty_table(Resume)
-        empty_table(Job)
+        # empty_table(Job)
         print('---清空完毕---')
     except Exception as e:
         print(e)
@@ -260,11 +260,11 @@ def run(user_num=20, company_num=20, clearing_db=False):
             db.session.add(seeker)
         db.session.commit()
 
-        print('开始生成公司')
-        test_companies = list(iter_users(company_num, User.ROLE_COMPANY))
-        for company in test_companies:
-            db.session.add(company)
-        db.session.commit()
+        # print('开始生成公司')
+        # test_companies = list(iter_users(company_num, User.ROLE_COMPANY))
+        # for company in test_companies:
+        #     db.session.add(company)
+        # db.session.commit()
 
         print('开始生成求职者信息')
         test_seekers_info = list(iter_seekers(test_seekers))
@@ -272,11 +272,11 @@ def run(user_num=20, company_num=20, clearing_db=False):
             db.session.add(seeker_info)
         db.session.commit()
 
-        print('开始生成公司信息')
-        test_companies_info = list(iter_companies(test_companies))
-        for company_info in test_companies_info:
-            db.session.add(company_info)
-        db.session.commit()
+        # print('开始生成公司信息')
+        # test_companies_info = list(iter_companies(test_companies))
+        # for company_info in test_companies_info:
+        #     db.session.add(company_info)
+        # db.session.commit()
 
         print('开始生成简历和职位')
         test_resumes = list(iter_resumes(test_seekers))
@@ -293,22 +293,22 @@ def run(user_num=20, company_num=20, clearing_db=False):
         print('正在进行模拟关注')
         simulate_following(test_seekers, test_jobs)
 
-        print('更新统计数据')
-        for resume in test_resumes:
-            resume.update_statics()
-            db.session.add(resume)
+#         print('更新统计数据')
+#         for resume in test_resumes:
+#             resume.update_statics()
+#             db.session.add(resume)
 
-        for job in test_jobs:
-            job.update_statics()
-            db.session.add(job)
+#         for job in test_jobs:
+#             job.update_statics()
+#             db.session.add(job)
 
-        for company in test_companies_info:
-            company.update_statics()
-            db.session.add(company)
+#         for company in test_companies_info:
+#             company.update_statics()
+#             db.session.add(company)
 
-        for seeker in test_seekers_info:
-            seeker.update_statics()
-            db.session.add(seeker)
+#         for seeker in test_seekers_info:
+#             seeker.update_statics()
+#             db.session.add(seeker)
 
         db.session.commit()
         print('---数据生成完毕！---')

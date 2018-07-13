@@ -1,0 +1,9 @@
+{% extends "job/admin/index.html" %}
+{% from "macros.html" import render_pagination, render_company_resumes_admin %}
+
+{% block title %}简历管理- Jobplus{% endblock %}
+
+{% block admin %}
+{{ render_company_resumes_admin(pagination, page_type='waiting') }}
+{{ render_pagination(pagination, 'job.todolist') }}
+{% endblock %}
