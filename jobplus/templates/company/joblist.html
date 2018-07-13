@@ -1,0 +1,26 @@
+{% extends "company/detail.html" %}
+{% from "macros.html" import render_pagination %}
+{% set detail_active_page = 'company_joblist' %}
+
+{% block detail %}
+<br>
+{% for job in pagination.items %}
+<div class="row">
+    <div class="col-md-9">
+        <a href="{{ url_for('job.detail', job_id=job.id) }}"><h4 style="margin-bottom:20px;">{{ job.title }}</h4></a>
+        <span class="text-primary">{% if job.salary_min == 0 and job.salary_min ==0 %}工资面议{% else %}
+{{ job.salary_min | salary_format }} - {{ job.salary_max | salary_format }}{% endif %}</span>&nbsp;&nbsp;
+        <span>{{ job.exp_req_list[job.exp_required] }}</span>&nbsp;&nbsp;
+        <span>{{ job.edu_req_list[job.edu_required] }}</span>&nbsp;&nbsp;
+        <span>{{ '全职' if job.is_full_time else '兼职' }}<span>
+    </div>
+    <div class="col-md-3 text-center">
+        <h4 class="text-center" style="margin-top:8px;"><small>{{ job.updated_at |timesince }}</small></h4>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('job.detail', job_id=job.id) }}" role="button">查看</a>
+    </div>
+</div>
+
+    <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="100%" color=#987cb9 SIZE=3>
+{% endfor %}
+{{ render_pagination(pagination, 'company.company_joblist', company_id=company_obj.id) }}
+{% endblock %}

@@ -1,7 +1,15 @@
 {% extends "base.html" %}
+{% set active_page = 'company' %}
 {% set job = company_obj.new_job %}
 {% set industry_list = company_obj.industry | sentence_split %}
 {% set products = company_obj.products_display | sentence_split %}
+{% set detail_active_page = detail_active_page | default('company_detail') %}
+{% set company_detail_navbar = [
+    (company_obj.detail_url, 'company_detail', '企业主页'),
+    (url_for('company.company_joblist', company_id=company_obj.id), 'company_joblist', '招聘职位'),
+    ]%}
+
+{% block title %}企业详情 - Jobplus{% endblock %}
 
 {% block body %}
 <br>
@@ -12,8 +20,8 @@
                 <div class="media">
                     <div class="media-left">
                     <img src="{{ company_obj.get_img('logo') }}" class="media-object img-thumbnail company-img">
-                </div>
-                <div class="media-body media-right">
+                    </div>
+                    <div class="media-body media-right">
                     <h3 class="media-heading">{{ company_obj.name }}</h3>
                     <p><a class="company-site" target="_blank" rel="nofollow" href="{{ company_obj.web_url | ex_link }}">{{ company_obj.web_url }}</a></p>
                     <p>{{ company_obj.slogan }}</p>
@@ -21,16 +29,22 @@
                     {% for industry in industry_list %}
                     <span class="label label-primary">{{ industry }}</span>
                     {% endfor %}
-                </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-3 hidden-xs">
                 <div class="mb10">
-                        {% if current_user in company_obj.follows %}
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.role==current_user.ROLE_COMPANY and current_user.company_info.name == company_obj.name %}
+                            <a href="{{ url_for('company.edit_profile') }}" class="btn btn-sm btn-primary active" role="button" style="margin-right:5px;">修改信息</a>
+                        {% elif current_user in company_obj.follows %}
                             <a href="{{ url_for('company.follow', company_id=company_obj.id) }}" class="btn btn-sm btn-primary active" role="button" style="margin-right:5px;">取消关注</a>
                         {% else %}
-                            <a href="{{ url_for('company.follow', company_id=company_obj.id) }}" class="btn btn-sm btn-success active" role="button" style="margin-right:5px;">关注</a>
+                        <a href="{{ url_for('company.follow', company_id=company_obj.id) }}" class="btn btn-sm btn-success active" role="button" style="margin-right:5px;">关注</a>
                         {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('company.follow', company_id=company_obj.id) }}" class="btn btn-sm btn-success active" role="button" style="margin-right:5px;">关注</a>
+                    {% endif %}
                     <span><strong> {{ company_obj.follows | length }}</strong> 人关注， </span>
                     <span><strong>{{ company_obj.view_count }}</strong>浏览</span>
                 </div>
@@ -42,8 +56,12 @@
         <div class="container">
             <div class="row">
                 <ul class="nav nav-tabs" style="margin-left:15px;">
-                    <li role="presentation" class="active"><a href="#">企业主页</a></li>
-                    <li role="presentation"><a href="#">招聘职位</a></li>
+                        {% for href, id, caption in company_detail_navbar %}
+                        <li role="presentation" {% if id == detail_active_page %} class="active"{% endif %}>
+                            <a href="{{ href }}">
+                            <span {% if id == detail_active_page %}class="text-success"{% endif %}>{{ caption|e }}{% if id == 'company_joblist' %}<span class="badge">{{ company_obj.jobs_available }}</span>{% endif %}</span>
+                        </a></li>
+                        {% endfor %}
                 </ul>
             </div>
         </div>
@@ -52,6 +70,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-9">
+                    {% block detail %}
                     <h3>关于我们</h3>
                     <pre>{{ company_obj.description }}</pre>
                     <h3>公司产品</h3>
@@ -62,31 +81,34 @@
                     <address style="text-indent:1em;">
                         <strong>{{ company_obj.address }}</strong><br>
                     </address>
+                    {% endblock %}
                 </div>
                 <div class="col-md-3 hr-info" style="margin-top: 20px;">
                     <div class="row text-center">
                         <div class="panel panel-primary">
                             <div class="panel-heading">招聘负责人</div>
                             <div class="panel-body">
-                                <img src="{{ company_obj.get_img('manager_photo') }}" class="img-circle pull-center">
+                                <img src="{{ company_obj.get_img('manager_photo') }}" class="img-circle pull-center manager_photo">
                                 <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="100%" color=#987cb9 SIZE=3>
                                 <h3 style="color:firebrick"><strong>{{ company_obj.manager_name }}</strong></h3>
                                 <h4>{{ company_obj.manager_job }}</h4>
                             </div>
                         </div>
-                        {% if job %}
+                        {% if job and detail_active_page == 'company_detail' %}
                             <div class="panel panel-success" style="margin-top: 20px;">
                                 <div class="panel-heading">
                                     <h3 class="panel-title text-center">最新招聘职位</h3>
                                 </div>
                                 <div class="panel-body">
-                                    <a href="#"><h3>{{ job.title }}</h3></a>
-                                    <p><span>{{ job.salary_min }}-{{ job.salary_max }}</span>
-                                    <span>经验{{ job.exp_required }}</span>
-                                    <span>{{ job.edu_required }}</span>
-                                    <span>{{ job.is_full_time }}</span>
+                                    <a href="{{ url_for('job.detail',job_id=job.id) }}"><h3>{{ job.title }}</h3></a>
+                                    <p>
+                                        <span>学历{{ job.edu_req_list[job.edu_required] }}</span>
+                                        <span style="margin-left:4px;">{{ '全职' if job.is_full_time else '兼职' }}</span>
+                                        <br>
+                                        <span style="color:indianred;">{{ job.salary_min }}-{{ job.salary_max }}</span>
+                                        <span style="margin-left:4px;">{{ job.exp_req_list[job.exp_required] }}</span>
                                     </p>
-                                    <a href="#">查看全部职位→</a>
+                                    <a href="{{ url_for('company.company_joblist', company_id=company_obj.id) }}">查看全部职位→</a>
                                 </div>
                             </div>
                         {% endif %}

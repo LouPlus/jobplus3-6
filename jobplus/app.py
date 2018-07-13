@@ -7,7 +7,7 @@ import re
 from flask import Flask
 from flask_migrate import Migrate
 from flask_login import LoginManager
-from flask_uploads import configure_uploads, patch_request_class
+from flask_uploads import configure_uploads
 
 from jobplus.config import configs
 from jobplus.models import db, User
@@ -52,12 +52,12 @@ def register_filters(app):
     
     @app.template_filter()
     def sentence_split(sentence):
-        return re.split(r",|\.|;|，|；|、|\s|/|\\", sentence)
+        return re.split(r",|\.|;|，|；|、|/|\\", sentence)
 
     @app.template_filter()
     def ex_link(url):
         url = str(url)
-        if 'http://' in url or 'https' in url:
+        if 'http://' in url or 'https://' in url:
             return url
         else:
             return "http://" + str(url)
@@ -81,7 +81,28 @@ def register_filters(app):
         else:
             return long_string
 
+    @app.template_filter()
+    def utc_to_cst(date_time):
+        timenow = (date_time + datetime.timedelta(hours=8))
+        return timenow
 
+    @app.template_filter()
+    def salary_format(salary):
+        """ 将数据库内存储的工资数据格式化输出
+            Args:
+                salary (int): 工资数据
+            
+            e.g. 1000 => 1k
+        """
+        if salary >= 1000:
+            if salary % 1000:
+                num = round(salary/1000, 1)
+                return ''.join([str(num), 'k'])
+            else:
+                num = int(salary/1000)
+                return ''.join([str(num), 'k'])
+
+              
 def register_blueprints(app):
     from .handlers import front, company, job, seeker, admin
 
@@ -104,6 +125,8 @@ def register_extensions(app):
         return User.query.get(id)
 
     login_manager.login_view = 'front.login'
+    login_manager.login_message = '请登录后操作！'
+    login_manager.login_message_category = "danger"
 
 
 def create_app(config):

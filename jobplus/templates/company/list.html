@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 {% from 'macros.html' import render_pagination %}
+{% set active_page = 'company' %}
 
+{% block title %}企业 - Jobplus{% endblock %}
 
 {% block body %}
 <div class="row">
   <div class="col-md-1"></div>
   <div class="col-xs-12 col-md-10 main">
     <br>
-    <h1>企业列表</h1>
+    <h2>企业列表</h2>
     <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" width="100%" color=#987cb9 SIZE=3>
     {% for company in pagination.items %}
     <div class="company-list">
@@ -33,7 +35,7 @@
             <p>
               <small>
                 <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                <a class="company-list-single-info-num" target="_blank" href="#"><span>{{ company.jobs_available }}</span></a>
+                <a class="company-list-single-info-num" target="_blank" href="{{ url_for('company.company_joblist', company_id=company.id) }}"><span>{{ company.jobs_available }}</span></a>
                 <span>个在招职位</span>
               </small>
             </p>
