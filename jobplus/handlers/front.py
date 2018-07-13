@@ -2,9 +2,10 @@
 # encoding: utf-8
 
 
-from flask import Blueprint, render_template, url_for, redirect, flash, request, current_app
+from flask import Blueprint, render_template, url_for, redirect, flash, request, current_app, session, make_response
 from jobplus.models import Job, User, Company, db
 from jobplus.forms import LoginForm
+from jobplus.tools import Captcha
 from flask_login import login_user, logout_user, login_required
 
 front = Blueprint('front', __name__)
@@ -70,3 +71,18 @@ def logout():
     flash('您已退出登录', 'success')
     return redirect(request.referrer)
 
+@front.route('/captcha/')
+def get_captcha():
+    from io import BytesIO
+    cap = Captcha()
+    image, word = cap.gen_captcha()
+    # 将验证码图片以二进制形式写入在内存中，防止将图片都放在文件夹中，占用大量磁盘
+    buf = BytesIO()
+    image.save(buf, 'gif')
+    buf_content = buf.getvalue()
+    # 把二进制作为response发回前端，并设置首部字段
+    response = make_response(buf_content)
+    response.headers['Content-Type'] = 'image/gif'
+    # 将验证码字符串储存在session中
+    session['captcha_word'] = word
+    return response

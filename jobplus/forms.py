@@ -5,7 +5,7 @@ import datetime
 import os
 
 from PIL import Image
-from flask import current_app
+from flask import current_app, session 
 from flask_wtf import FlaskForm
 from flask_uploads import UploadSet, IMAGES
 from flask_login import current_user
@@ -107,15 +107,13 @@ class UserinfoForm(FlaskForm):
 
 class SeekerRegisterForm(FlaskForm):
     # TODO 应该由正则表达式 Regexp 来验证用户名，只含数字和字母
-    username = StringField(
-        '用户名', validators=[DataRequired(message='用户名不可为空'), Length(3, 24)])
-    email = StringField('邮箱', validators=[DataRequired(message='邮箱地址不可为空'),
-                        Email(message='请正确填写邮箱地址')])
-    password = PasswordField('密码', validators=[DataRequired(message='密码不可为空'),
-                             Length(6, 24, message='密码长度应为6~24个字符')])
-    repeat_password = PasswordField('重复密码', validators=[
-                                    DataRequired(message='密码不可为空'),
-                                    EqualTo('password', message='两次输入的密码不一致')])
+
+    username = StringField('用户名', validators=[DataRequired(message='用户名不可为空'), Length(3, 24)])
+    email = StringField('邮箱', validators=[DataRequired(message='邮箱地址不可为空'), Email(message='请正确填写邮箱地址')])
+    password = PasswordField('密码', validators=[DataRequired(message='密码不可为空'), Length(6, 24, message='密码长度应为6~24个字符')])
+    repeat_password = PasswordField('重复密码', validators=[DataRequired(message='密码不可为空'), EqualTo('password', message='两次输入的密码不一致')])
+    captcha = StringField('验证码', validators=[DataRequired('请输入验证码'), Length(max=4)])
+
     submit = SubmitField('注册')
 
     def create_user(self):
@@ -135,20 +133,22 @@ class SeekerRegisterForm(FlaskForm):
         if User.query.filter_by(email=field.data).first():
             raise ValidationError('邮箱已经存在')
 
+    def validate_captcha(self, field):
+        captcha_word = session.get('captcha_word')
+        if captcha_word != self.captcha.data.upper():
+            raise ValidationError('验证码错误')
+
 
 class CompanyRegisterForm(FlaskForm):
 
     """ 企业注册页面表单模型 """
 
-    username = StringField('企业名称', validators=[DataRequired(message='请输入企业名称'),
-                           Length(2, 24, message='用户名长度请在4-24位'),
-                           Regexp('^[\u4E00-\u9FA5a-zA-Z0-9_]{4,24}$', message='请使用数字字符和下划线')])
-    email = StringField(
-        '邮箱', validators=[DataRequired('请输入邮箱'), Email(message='请输入合法的Email地址')])
-    password = PasswordField(
-        '密码', validators=[DataRequired('请输入密码'), Length(6, 24)])
-    repeat_password = PasswordField(
-        '重复密码', validators=[DataRequired('请重复输入密码'), EqualTo('password')])
+    username = StringField('企业名称', validators=[DataRequired(message='请输入企业名称'), Length(2, 24, message='用户名长度请在4-24位'), Regexp('^[\u4E00-\u9FA5a-zA-Z0-9_]{4,24}$',message='请使用数字字符和下划线')])
+    email = StringField('邮箱', validators=[DataRequired('请输入邮箱'), Email(message='请输入合法的Email地址')])
+    password = PasswordField('密码', validators=[DataRequired('请输入密码'), Length(6, 24)])
+    repeat_password = PasswordField('重复密码', validators=[DataRequired('请重复输入密码'), EqualTo('password')])
+    captcha = StringField('验证码', validators=[DataRequired('请输入验证码'), Length(max=4)])
+
     submit = SubmitField('提交')
 
     def validate_username(self, field):
@@ -160,6 +160,11 @@ class CompanyRegisterForm(FlaskForm):
         email = User.query.filter_by(email=field.data).first()
         if email:
             raise ValidationError('邮箱已存在')
+
+    def validate_captcha(self, field):
+        captcha_word = session.get('captcha_word')
+        if captcha_word != self.captcha.data.upper():
+            raise ValidationError('验证码错误')
 
     def create_company(self, role):
         user = User()

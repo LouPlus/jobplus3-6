@@ -102,6 +102,7 @@ def register_filters(app):
                 num = int(salary/1000)
                 return ''.join([str(num), 'k'])
 
+              
 def register_blueprints(app):
     from .handlers import front, company, job, seeker, admin
 

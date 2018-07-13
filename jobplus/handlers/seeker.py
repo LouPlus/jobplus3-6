@@ -29,7 +29,7 @@ def register():
     form = SeekerRegisterForm()
     if current_user.is_authenticated:
         # 如果用户已登录，并尝试打开注册页面，会被跳转到profile
-        if current_user.is_seeker():
+        if current_user.is_seeker:
             return redirect(url_for('.profile'))
         else:
             return redirect(url_for('front.index'))
