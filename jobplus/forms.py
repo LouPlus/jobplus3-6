@@ -113,7 +113,6 @@ class SeekerRegisterForm(FlaskForm):
     password = PasswordField('密码', validators=[DataRequired(message='密码不可为空'), Length(6, 24, message='密码长度应为6~24个字符')])
     repeat_password = PasswordField('重复密码', validators=[DataRequired(message='密码不可为空'), EqualTo('password', message='两次输入的密码不一致')])
     captcha = StringField('验证码', validators=[DataRequired('请输入验证码'), Length(max=4)])
-
     submit = SubmitField('注册')
 
     def create_user(self):
@@ -148,7 +147,6 @@ class CompanyRegisterForm(FlaskForm):
     password = PasswordField('密码', validators=[DataRequired('请输入密码'), Length(6, 24)])
     repeat_password = PasswordField('重复密码', validators=[DataRequired('请重复输入密码'), EqualTo('password')])
     captcha = StringField('验证码', validators=[DataRequired('请输入验证码'), Length(max=4)])
-
     submit = SubmitField('提交')
 
     def validate_username(self, field):
