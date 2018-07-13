@@ -1,170 +1,157 @@
 {% macro render_index_job(job) %}
-  <div class="col-sm-6 col-md-4">
+<div class="col-sm-6 col-md-4">
     <div class="thumbnail">
-      <!-- <img src="..." alt="..."> -->
-      <div class="caption">
-        <h4>{{ job.title | long_string_cutter(max_length=12) }}</h4>
-        <p>{{ job.created_at | timesince }} 发布</p>
-          {% if job.salary_min == 0 and job.salary_max ==0 %}
-          <b>面议</b>
-          {% else %}
-          <b>
-            {% if job.salary_min >= 1000 %}
-                {{ (job.salary_min//1000) }}K
+        <!-- <img src="..." alt="..."> -->
+        <div class="caption">
+            <h4>{{ job.title | long_string_cutter(max_length=9) }}</h4>
+            <p>{{ job.created_at | timesince }} 发布</p>
+            <b>
+            {% if job.salary_min == 0 and job.salary_max ==0 %}
+                面议
             {% else %}
-                {{ job.salary_min }}
+            
+                {% if job.salary_min >= 1000 %} 
+                    {{ (job.salary_min//1000) }}K 
+                {% else %} 
+                    {{ job.salary_min }} 
+                {% endif %} ~ 
+                    {% if job.salary_max >= 1000 %} 
+                        {% if (job.salary_max//1000) == (job.salary_min//1000) %} 
+                            {{ (job.salary_max//1000) + 1 }}K 
+                        {% else %} 
+                            {{ (job.salary_max//1000) }}K 
+                        {% endif %} 
+                    {% else %} 
+                        {{ job.salary_max }} 
+                    {% endif %} </b>
             {% endif %}
-              ~
-            {% if job.salary_max >= 1000 %}
-                {% if (job.salary_max//1000) == (job.salary_min//1000) %}
-                    {{ (job.salary_max//1000) + 1 }}K
-                {% else %}
-                {{ (job.salary_max//1000) }}K
-                {% endif %}
-            {% else %}
-                {{ job.salary_max }}
-            {% endif %}
-          {% endif %}
-          </b>
-        <p>{{ job.exp_req_list[job.exp_required] }} / {{ job.edu_req_list[job.edu_required] }} /
-        {% if job.is_full_time ==True %}
-            全职
-        {% else %}
-            兼职
-        {% endif %}
-        </p>
-        <p><b>{{ job.user.company_info.name | long_string_cutter }}</b></p>
-        <p><a href="{{ job.url }}" class="btn btn-primary" role="button">查看</a>
-            <!-- <a href="#" class="btn btn-default" role="button">关注</a> -->
-        </p>
-      </div>
+            
+            <p>{{ job.exp_req_list[job.exp_required] }} / {{ job.edu_req_list[job.edu_required] }} / {% if job.is_full_time
+                ==True %} 全职 {% else %} 兼职 {% endif %}
+            </p>
+            <p>
+                <b>{{ job.user.company_info.name | long_string_cutter(9) }}</b>
+            </p>
+            <p>
+                <a href="{{ job.url }}" class="btn btn-primary" role="button">查看</a>
+                <!-- <a href="#" class="btn btn-default" role="button">关注</a> -->
+            </p>
+        </div>
     </div>
-  </div>
-{% endmacro %}
+</div>
+{% endmacro %} 
 
 {% macro render_index_company(company_info) %}
-  <div class="col-sm-3 col-md-3">
+<div class="col-sm-6 col-md-3">
     <div class="thumbnail">
-      {% if company_info.logo == None %}
-      <img src="{{ url_for('static', filename='img/default_logo.jpg') }}" alt="...">
-      {% else %}
-      <img width="100px" height="100px" src="/static/company_img/{{ company_info.logo }}" alt="...">
-      {% endif %}
-      <div class="caption">
-        <h3><b class="company__name">{{ company_info.name | long_string_cutter(max_length=10) }}</b></h3>
-        <p>{{ company_info.industry }} 行业</p>
-        <p class="company__slogan">{{ company_info.slogan }}</p>
-        <p><a href="{{ company_info.url }}" class="btn btn-primary" role="button">查看详情</a>
-            <!-- <a href="#" class="btn btn-default" role="button">关注</a> -->
-        </p>
-      </div>
+        {% if company_info.logo == None %}
+        <img src="{{ url_for('static', filename='img/default_logo.jpg') }}" alt="..."> {% else %}
+        <img width="100px" height="100px" src="/static/company_img/{{ company_info.logo }}" alt="..."> {% endif %}
+        <div class="caption">
+            <h3>
+                <b class="company__name">{{ company_info.name | long_string_cutter(max_length=8) }}</b>
+            </h3>
+            <p>{{ company_info.industry }} 行业</p>
+            <p class="company__slogan">{{ company_info.slogan }}</p>
+            <p>
+                <a href="{{ company_info.url }}" class="btn btn-primary" role="button">查看详情</a>
+                <!-- <a href="#" class="btn btn-default" role="button">关注</a> -->
+            </p>
+        </div>
     </div>
-  </div>
-{% endmacro %}
+</div>
+{% endmacro %} 
 
 {% macro render_form(form, url) %}
-<form method="POST"  action="{{ url }}" enctype="multipart/form-data">
-  {{ form.csrf_token }}
-  {% for field in form %}
-    {% if field.type == 'CSRFTokenField' %}
-    {{ '' }}
-    {% elif field.type == 'SubmitField' %}
-    {{ form.submit(class='btn btn-primary', type='submit') }}
-    {% elif field.type == 'BooleanField' %}
+<form method="POST" action="{{ url }}" enctype="multipart/form-data">
+    {{ form.csrf_token }} {% for field in form %} {% if field.type == 'CSRFTokenField' %} {{ '' }} {% elif field.type == 'SubmitField'
+    %} {{ form.submit(class='btn btn-primary', type='submit') }} {% elif field.type == 'BooleanField' %}
     <div class="checkbox">
-      <label>{{ field() }} {{ field.label.text }}</label>
+        <label>{{ field() }} {{ field.label.text }}</label>
     </div>
-    {% elif field.type == 'FileField' %}
-      {{ field.label }} {{ field(class='file form-control',accept="image/png,image/bmp,image/jpeg") }}
-
+    {% elif field.type == 'FileField' %} {{ field.label }} {{ field(class='file form-control',accept="image/png,image/bmp,image/jpeg")
+  }}
     {% elif field.type == 'DateField' %}
     <div class="form-group">
-      {{ field.label }}
-      <div class='input-group date' id='datetimepicker'>
-        {{ field(class='form-control') }}
-        <span class="input-group-addon">
-          <span class="glyphicon glyphicon-calendar"></span>
-        </span>
-      </div>
+        {{ field.label }}
+        <div class='input-group date' id='datetimepicker'>
+            {{ field(class='form-control') }}
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+        </div>
     </div>
-      {% if field.errors %}
-        {% for error in field.errors %}
-        <span class="help-block">{{ error }}</span>
-        {% endfor %}
-      {% endif %}
-    {% else %}
+
+    {% if field.errors %} {% for error in field.errors %}
+    <span class="help-block">{{ error }}</span>
+    {% endfor %} {% endif %} {% else %}
     <div class="form-group">
-      {{ field.label }} {{ field(class='form-control') }}
-      {% if field.errors %}
-        {% for error in field.errors %}
+        {% if field.label.text == '验证码' %}
+        <img src="{{ url_for('front.get_captcha') }}" onclick="this.src='{{ url_for('front.get_captcha') }}?'+ Math.random()"> {% endif %} {{ field.label }} {{ field(class='form-control') }} {% if field.errors %} {% for error in field.errors
+        %}
         <span class="help-block">{{ error }}</span>
-        {% endfor %}
-      {% endif %}
+        {% endfor %} {% endif %}
     </div>
-    {% endif %}
-    {% endfor %}
+    {% endif %} {% endfor %}
 </form>
-{% endmacro %}
+{% endmacro %} 
 
 {% macro render_job_list(job) %}
-  <div class="col-sm-6 col-md-4">
+<div class="col-sm-6 col-md-4">
     <div class="thumbnail">
-      <!-- <img src="..." alt="..."> -->
-      <div class="caption">
-        <h4>{{ job.title | long_string_cutter(max_length=12) }}</h4>
-        <p>{{ job.created_at | timesince }} 发布</p>
-          {% if job.salary_min == 0 and job.salary_max ==0 %}
-          <b>面议</b>
-          {% else %}
-          <b>
-            {% if job.salary_min >= 1000 %}
-                {{ (job.salary_min//1000) }}K
+        <!-- <img src="..." alt="..."> -->
+        <div class="caption">
+            <h4>{{ job.title | long_string_cutter(max_length=8) }}</h4>
+            <p>{{ job.created_at | timesince }} 发布</p>
+            {% if job.salary_min == 0 and job.salary_max ==0 %}
+            <b>面议</b>
             {% else %}
-                {{ job.salary_min }}
-            {% endif %}
-            {% if job.salary_max >= 1000 %}
-                {% if (job.salary_max//1000) == (job.salary_min//1000) %}
-                    {{ (job.salary_max//1000) + 1 }}K
-                {% else %}
-                {{ (job.salary_max//1000) }}K
-                {% endif %}
-            {% else %}
-                {{ job.salary_max }}
-            {% endif %}
-          {% endif %}
-          </b>
-        <p>{{ job.exp_req_list[job.exp_required] }} / {{ job.edu_req_list[job.edu_required] }} /
-        {% if job.is_full_time ==True %}
-            全职
-        {% else %}
-            兼职
-        {% endif %}
-        </p>
-        <p><b>{{ job.user.company_info.name | long_string_cutter}}</b></p>
-        <p><a href="{{ job.url }}" class="btn btn-primary" role="button">查看</a>
-            <!-- <a href="#" class="btn btn-default" role="button">关注</a> -->
-        </p>
-      </div>
+            <b>
+                {% if job.salary_min >= 1000 %} {{ (job.salary_min//1000) }}K {% else %} {{ job.salary_min }} {% endif %} {% if job.salary_max
+                >= 1000 %} {% if (job.salary_max//1000) == (job.salary_min//1000) %} {{ (job.salary_max//1000) + 1 }}K {%
+                else %} {{ (job.salary_max//1000) }}K {% endif %} {% else %} {{ job.salary_max }} {% endif %} {% endif %}
+            </b>
+            <p>{{ job.exp_req_list[job.exp_required] }} / {{ job.edu_req_list[job.edu_required] }} / {% if job.is_full_time
+                ==True %} 全职 {% else %} 兼职 {% endif %}
+            </p>
+            <p>
+                <b>{{ job.user.company_info.name | long_string_cutter}}</b>
+            </p>
+            <p>
+                <a href="{{ job.url }}" class="btn btn-primary" role="button">查看</a>
+                <!-- <a href="#" class="btn btn-default" role="button">关注</a> -->
+            </p>
+        </div>
     </div>
-  </div>
-{% endmacro %}
+</div>
+{% endmacro %} 
 
 {% macro render_pagination(pagination, endpoint) %}
 <nav class="nav-pagination" aria-label="Page navigation">
-  <ul class=pagination>
-  <li{% if not pagination.has_prev %} class="disabled"{% endif %}><a href="{{url_for(endpoint, page=pagination.prev_num) if pagination.has_prev else '#'}}">&laquo;</a></li>
-  {% for page in pagination.iter_pages() %}
-    {% if page %}
-      {% if page != pagination.page %}
-      <li><a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a></li>
-      {% else %}
-      <li class="active"><a href="#">{{page}} <span class="sr-only">(current)</span></a></li>
-      {% endif %}
-    {% else %}
-      <span class=ellipsis>…</span>
-    {% endif %}
-  {% endfor %}
-  <li{% if not pagination.has_next %} class="disabled"{% endif %}><a href="{{url_for(endpoint, page=pagination.next_num) if pagination.has_next else '#'}}">&raquo;</a></li>
-  </ul>
+    <ul class=pagination>
+        <li {% if not pagination.has_prev %} class="disabled" {% endif %}>
+            <a href="{{url_for(endpoint, page=pagination.prev_num) if pagination.has_prev else '#'}}">&laquo;</a>
+            </li>
+            {% for page in pagination.iter_pages() %} 
+                {% if page %} 
+                    {% if page != pagination.page %}
+                        <li>
+                            <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+                        </li>
+                    {% else %}
+                        <li class="active">
+                            <a href="#">{{page}}
+                                <span class="sr-only">(current)</span>
+                            </a>
+                        </li>
+                    {% endif %} 
+                {% else %}
+                    <span class=ellipsis>…</span>
+                {% endif %} 
+            {% endfor %}
+        <li {% if not pagination.has_next %} class="disabled" {% endif %}>
+            <a href="{{url_for(endpoint, page=pagination.next_num) if pagination.has_next else '#'}}">&raquo;</a>
+        </li>
+    </ul>
 </nav>
 {% endmacro %}
